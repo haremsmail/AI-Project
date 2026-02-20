@@ -1,145 +1,142 @@
-"""
-Face Detection Agent - Detects faces in images using MTCNN
-"""
+"""Face detection agent using OpenCV Haar Cascade."""
+
+from __future__ import annotations
+
+from typing import List
 
 import logging
 import cv2
 import numpy as np
-from mtcnn import MTCNN
 
 logger = logging.getLogger(__name__)
 
 
 class FaceDetectionAgent:
-    """Agent responsible for detecting faces in images"""
-    
-    def __init__(self):
-        """Initialize the face detection agent with MTCNN detector"""
-        self.detector = MTCNN()
-        self.last_frame = None  # Store last webcam frame for ROI extraction
-        logger.info("FaceDetectionAgent initialized")
-    
-    def detect_faces(self, image_path):
-        """
-        Detect faces in an image
-        
+    """Detects and extracts faces from images or webcam input."""
+
+    def __init__(self) -> None:
+        """Initialize the face detection agent with Haar Cascade classifier."""
+        self.cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+        self.face_cascade = cv2.CascadeClassifier(self.cascade_path)
+        if self.face_cascade.empty():
+            raise RuntimeError("Failed to load Haar Cascade classifier")
+        self.last_frame = None
+        logger.info("FaceDetectionAgent initialized with Haar Cascade")
+
+    def detect_from_path(self, image_path: str) -> List[np.ndarray]:
+        """Detect faces from an image file.
+
         Args:
-            image_path: Path to the image file
-            
+            image_path: Path to the input image file.
+
         Returns:
-            List of detected faces with bounding boxes and confidence
+            List of detected face images as BGR numpy arrays.
         """
         try:
-            # Load image
             image = cv2.imread(image_path)
             if image is None:
-                logger.error(f"Failed to load image: {image_path}")
+                logger.error(f"Failed to load image from {image_path}")
                 return []
-            
-            # Convert BGR to RGB
-            image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            
-            # Detect faces
-            faces = self.detector.detect_faces(image_rgb)
-            
-            logger.info(f"Detected {len(faces)} face(s) in {image_path}")
-            return faces
-            
-        except Exception as e:
-            logger.error(f"Error detecting faces in {image_path}: {e}", exc_info=True)
+            self.last_frame = image
+            return self._detect_faces(image)
+        except Exception as exc:
+            logger.exception(f"Error detecting faces from {image_path}")
             return []
-    
-    def detect_from_path(self, image_path):
-        """Detect faces from an image path (alias for detect_faces)"""
-        return self.detect_faces(image_path)
-    
-    def detect_from_webcam(self):
-        """
-        Detect faces from webcam
-        
-        Returns:
-            List of detected faces from webcam feed
-        """
-        try:
-            # Try multiple camera indices
-            for camera_idx in range(3):
-                cap = cv2.VideoCapture(camera_idx)
-                if cap.isOpened():
-                    faces = []
-                    frame = None
-                    # Warm up and try multiple frames until a face is detected
-                    for _ in range(12):
-                        ret, frame = cap.read()
-                        if not ret or frame is None or frame.shape[0] == 0:
-                            continue
 
-                        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                        faces = self.detector.detect_faces(frame_rgb)
-                        if faces:
-                            break
+    def detect_from_webcam(self, timeout_seconds: int = 30) -> List[np.ndarray]:
+        """Detect faces from webcam input.
 
-                    cap.release()
-
-                    if frame is None or frame.shape[0] == 0:
-                        continue
-
-                    # Store frame for later ROI extraction
-                    self.last_frame = frame
-
-                    logger.info(
-                        f"Detected {len(faces)} face(s) from webcam (camera {camera_idx})"
-                    )
-                    return faces
-            
-            # If we get here, no camera worked
-            logger.error("No available camera found")
-            print("Webcam Error: No camera device found. Please check your camera connection.")
-            return []
-            
-        except Exception as e:
-            logger.error(f"Error detecting faces from webcam: {e}", exc_info=True)
-            print(f"Webcam Error: {str(e)}")
-            return []
-    
-    def extract_face_roi(self, image_path, face_detection):
-        """
-        Extract face region of interest from image
-        
         Args:
-            image_path: Path to the image file (None for webcam)
-            face_detection: Face detection dictionary from MTCNN
-            
+            timeout_seconds: Maximum seconds to capture from webcam.
+
         Returns:
-            Face ROI as numpy array
+            List of detected face images as BGR numpy arrays.
+        """
+        faces = []
+        try:
+            cap = cv2.VideoCapture(0)
+            if not cap.isOpened():
+                logger.error("Failed to open webcam")
+                return []
+            frame_count = 0
+            while True:
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                self.last_frame = frame
+                detected_faces = self._detect_faces(frame)
+                faces.extend(detected_faces)
+                frame_count += 1
+                if frame_count > timeout_seconds * 30:  # ~30 FPS
+                    break
+                # Display frame with detections
+                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                face_rects = self.face_cascade.detectMultiScale(
+                    gray, scaleFactor=1.1, minNeighbors=4, minSize=(20, 20)
+                )
+                for x, y, w, h in face_rects:
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                cv2.imshow("Webcam - Press Q to stop", frame)
+                if cv2.waitKey(1) & 0xFF == ord("q"):
+                    break
+            cap.release()
+            cv2.destroyAllWindows()
+        except Exception as exc:
+            logger.exception("Error capturing from webcam")
+        return faces
+
+    def detect_faces(self, image: np.ndarray) -> List[np.ndarray]:
+        """Detect faces from an in-memory image array."""
+        return self._detect_faces(image)
+
+    def _detect_faces(self, image: np.ndarray) -> List[np.ndarray]:
+        """Detect faces in an image using Haar Cascade.
+
+        Args:
+            image: Input image in BGR format.
+
+        Returns:
+            List of detected face images as BGR numpy arrays.
+        """
+        if image is None or image.size == 0:
+            return []
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        
+        # Use optimized parameters for better detection
+        faces = self.face_cascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,  # More sensitive (lower = slower but more thorough)
+            minNeighbors=4,   # Less strict (lower = more detections but more false positives)
+            minSize=(20, 20)  # Allow smaller faces
+        )
+        
+        face_images = []
+        for x, y, w, h in faces:
+            # Add padding for better face region
+            padding = 10
+            x1 = max(0, x - padding)
+            y1 = max(0, y - padding)
+            x2 = min(image.shape[1], x + w + padding)
+            y2 = min(image.shape[0], y + h + padding)
+            face_bgr = image[y1:y2, x1:x2].copy()
+            if face_bgr.size > 0:
+                face_images.append(face_bgr)
+        return face_images
+
+    def extract_face_roi(self, image_path: str | None, face_bgr: np.ndarray) -> np.ndarray:
+        """Extract face region of interest.
+
+        Args:
+            image_path: Path to image (unused, kept for compatibility)
+            face_bgr: Face BGR image from _detect_faces
+
+        Returns:
+            Face ROI as numpy array.
         """
         try:
-            # Use webcam frame if image_path is None
-            if image_path is None:
-                if self.last_frame is None:
-                    logger.error("No webcam frame available")
-                    return None
-                image = self.last_frame
-            else:
-                image = cv2.imread(image_path)
-                if image is None:
-                    logger.error(f"Failed to load image: {image_path}")
-                    return None
-            
-            # Extract bounding box
-            box = face_detection['box']
-            x, y, w, h = box
-            
-            # Ensure coordinates are within image bounds
-            x = max(0, x)
-            y = max(0, y)
-            x_end = min(image.shape[1], x + w)
-            y_end = min(image.shape[0], y + h)
-            
-            # Extract ROI
-            face_roi = image[y:y_end, x:x_end]
-            
-            return face_roi
-            
-        except Exception as e:
-            logger.error(f"Error extracting face ROI: {e}", exc_info=True)
+            if face_bgr is None or face_bgr.size == 0:
+                return None
+            return face_bgr
+        except Exception as exc:
+            logger.exception("Error extracting face ROI")
             return None

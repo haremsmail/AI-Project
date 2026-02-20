@@ -53,20 +53,27 @@ def main() -> None:
     if not args.image and not args.webcam:
         parser.error("Provide --image or --webcam input")
 
-    # Agent 1: Face Detection
-    face_agent = FaceDetectionAgent()
-    print("[Agent1] FaceDetectionAgent - Detected faces")
-
     # Setup directories and agents
     reports_dir = Path("reports")
     reports_dir.mkdir(exist_ok=True)
+
+    # Agent 1: Face Detection
+    print("[Agent1] FaceDetectionAgent - Initializing...")
+    face_agent = FaceDetectionAgent()
     
-    # For webcam, save the frame
-    if args.webcam:
-        webcam_frame_path = _save_webcam_frame(face_agent, reports_dir)
-        image_path_to_use = webcam_frame_path
+    # Detect faces
+    if args.image:
+        print(f"[Agent1] Loading image: {args.image}")
+        faces = face_agent.detect_from_path(args.image)
     else:
-        image_path_to_use = args.image
+        print("[Agent1] Capturing from webcam...")
+        faces = face_agent.detect_from_webcam()
+    
+    if not faces:
+        print("[Agent1] ERROR: No faces detected in input")
+        return
+    
+    print(f"[Agent1] FaceDetectionAgent - Detected {len(faces)} face(s)")
 
     # Agent 2: Face Embedding
     embedding_agent = FaceEmbeddingAgent()
@@ -82,6 +89,9 @@ def main() -> None:
         database_dir="wanted_database",
         threshold=threshold,
     )
+    
+    print(f"[Agent3] WantedComparisonAgent - Loaded {len(comparison.database)} wanted persons")
+    
     reporting_agent = ReportingAgent(reports_dir=str(reports_dir))
     
     try:
@@ -95,69 +105,59 @@ def main() -> None:
     best_match = None
     best_score = 0.0
     best_face_path = None
+    all_results = []
 
-    if args.webcam:
-        max_attempts = 5
-        for _ in range(max_attempts):
-            faces = face_agent.detect_from_webcam()
-            if not faces:
-                continue
-
-            for idx, face_data in enumerate(faces, 1):
-                face_bgr = face_agent.extract_face_roi(None, face_data)
-                if face_bgr is None:
-                    continue
-
-                face_path = _save_face_image(face_bgr, reports_dir, idx)
-                embedding = embedding_agent.get_embedding(face_bgr)
-                result = comparison.compare(embedding)
-
-                if result["score"] > best_score:
-                    best_match = result["name"]
-                    best_score = result["score"]
-                    best_face_path = face_path
-
-                reporting_agent.generate_report(
-                    face_path=face_path,
-                    detected_embedding=embedding,
-                    comparison_result=result,
-                    face_index=idx,
-                )
-
-            if best_score >= threshold:
-                break
-    else:
-        faces = face_agent.detect_from_path(args.image)
-        if not faces:
-            print("No faces detected in input")
-            return
-
-        for idx, face_data in enumerate(faces, 1):
-            face_bgr = face_agent.extract_face_roi(image_path_to_use, face_data)
-            if face_bgr is None:
-                continue
-
-            face_path = _save_face_image(face_bgr, reports_dir, idx)
+    for idx, face_bgr in enumerate(faces, 1):
+        # Face image is already cropped from detect_from_path/detect_from_webcam
+        face_path = _save_face_image(face_bgr, reports_dir, idx)
+        
+        print(f"\n[Processing] Face {idx}/{len(faces)}")
+        print(f"  Saved to: {face_path}")
+        
+        # Get embedding
+        try:
             embedding = embedding_agent.get_embedding(face_bgr)
-            result = comparison.compare(embedding)
+            print(f"  Embedding computed (size: {len(embedding)})")
+        except Exception as e:
+            print(f"  ERROR computing embedding: {e}")
+            continue
+        
+        # Compare with wanted database
+        result = comparison.compare(embedding)
+        all_results.append((face_path, result))
+        
+        print(f"  Comparison score: {result['score']:.4f}")
+        print(f"  Match: {result['name'] if result['match'] else 'NO MATCH'}")
+        
+        if result["score"] > best_score:
+            best_match = result["name"]
+            best_score = result["score"]
+            best_face_path = face_path
 
-            if result["score"] > best_score:
-                best_match = result["name"]
-                best_score = result["score"]
-                best_face_path = face_path
-
-            reporting_agent.generate_report(
-                face_path=face_path,
-                detected_embedding=embedding,
-                comparison_result=result,
-                face_index=idx,
-            )
+        # Generate report
+        reporting_agent.generate_report(
+            face_path=face_path,
+            detected_embedding=embedding,
+            comparison_result=result,
+            face_index=idx,
+        )
 
     # Agent 3: Report best match
+    print(f"\n[Agent3] WantedComparisonAgent - Comparison Results")
+    print(f"{'='*60}")
+    for face_path, result in all_results:
+        status = "MATCH" if result["match"] else "NO MATCH"
+        print(f"Face: {Path(face_path).name}")
+        print(f"  Score: {result['score']:.4f} (threshold: {threshold})")
+        print(f"  Status: {status}")
+        if result["name"]:
+            print(f"  Matched: {result['name']}")
+        print()
+    
     if best_match and best_score >= threshold:
-        print(f"[Agent3] WantedComparisonAgent - Found match ({best_match}, score={best_score:.3f})")
+        print(f"[Agent3] ALERT: Found wanted person '{best_match}' with score {best_score:.4f}")
     else:
-        print(f"[Agent3] WantedComparisonAgent - No match found")
+        print(f"[Agent3] No wanted person found (best score: {best_score:.4f})")
 
     # Agent 4: Email Alert
     if best_match and best_score >= threshold:
@@ -168,16 +168,18 @@ def main() -> None:
                     score=best_score,
                     matched_name=best_match,
                 )
-                print("[Agent4] EmailAlertAgent - Sent alert email")
+                print(f"[Agent4] EmailAlertAgent - Sent alert email for {best_match}")
             except Exception as e:
                 print(f"[Agent4] EmailAlertAgent - Failed: {e}")
         else:
-            print("[Agent4] EmailAlertAgent - Email not configured")
+            print("[Agent4] EmailAlertAgent - Email not configured (skipped)")
     else:
-        print("[Agent4] EmailAlertAgent - Skipped (no match)")
+        print("[Agent4] EmailAlertAgent - Skipped (no match above threshold)")
 
     # Agent 5: Report saved
-    print("[Agent5] ReportingAgent - Saved JSON report")
+    print(f"\n[Agent5] ReportingAgent - Saved {len(all_results)} JSON report(s)")
+    reports = reporting_agent.get_reports()
+    print(f"[Agent5] Total reports in directory: {len(reports)}")
 
 
 if __name__ == "__main__":
