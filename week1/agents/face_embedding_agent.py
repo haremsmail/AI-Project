@@ -10,6 +10,7 @@ class FaceEmbeddingAgent:
     """" the class face embeding to find face number in the video"""
     def __init__(self) -> None:
         print("[Init] Face embedding agent ready")
+        """ to ensure second agent is ready """
 
     def get_embedding(self, face_bgr: np.ndarray) -> np.ndarray:
      

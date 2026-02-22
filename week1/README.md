@@ -26,8 +26,7 @@ SMTP_PORT=587
 
 3. Verify setup:
 ```bash
-python test_diagnostic.py
-```
+
 
 ## Run
 
@@ -43,7 +42,7 @@ python view_reports.py
 
 ## Agents
 
-- **Face Detection** - MTCNN detector from webcam
+- **Face Detection** - har cascade detector from webcam
 - **Face Embedding** - Convert faces to vectors
 - **Wanted Comparison** - Match against database
 - **Email Alert** - Send notifications

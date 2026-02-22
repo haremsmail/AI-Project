@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import json
+""" used to save report in the json file 
+"""
 import logging
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional
 
 import numpy as np
+"""used to for face embding vector"""
 
 logger = logging.getLogger(__name__)
 
@@ -24,14 +27,17 @@ class ReportingAgent:
         """
         self.reports_dir = Path(reports_dir)
         self.reports_dir.mkdir(exist_ok=True, parents=True)
+        """" create a folder if not exit"""
 
     def generate_report(
         self,
         face_path: str,
         detected_embedding: np.ndarray,
+        
         comparison_result: Dict[str, Any],
         face_index: int,
     ) -> str:
+        """ face image yak face vector """
         """Generate and save a detection report as JSON.
         
         Args:
@@ -48,6 +54,7 @@ class ReportingAgent:
         try:
             timestamp = datetime.now().isoformat()
             report_id = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+            """ create unique report id """
             
             report_data = {
                 "timestamp": timestamp,

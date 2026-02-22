@@ -77,8 +77,6 @@ class FaceDetectionAgent:
                 if not ret:
                     break
                 self.last_frame = frame
-                detected_faces = self._detect_faces(frame)
-                faces.extend(detected_faces)
                 frame_count += 1
                 """" if the not success stop  and if success face go to lastframe and then"""
                 if frame_count > timeout_seconds * 30:  # ~30 FPS
@@ -95,6 +93,9 @@ class FaceDetectionAgent:
                 cv2.imshow("Webcam - Press Q to stop", frame)
                 if cv2.waitKey(1) & 0xFF == ord("q"):
                     break
+            # Only detect faces from the final captured frame
+            if self.last_frame is not None:
+                faces = self._detect_faces(self.last_frame)
             cap.release()
             cv2.destroyAllWindows()
         except Exception as exc:
