@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 class WantedComparisonAgent:
     """ compare face embiding and  wanted data base"""
+    """ o,4 distance"""
     def __init__(
         
         self,
@@ -32,10 +33,12 @@ class WantedComparisonAgent:
         threshold: float = 0.4,
         face_detector: Optional[FaceDetectionAgent] = None,
     ) -> None:
-        """ self is object instance
+    
+        """ self is object instance bchukr la 0.4 match
         vector of the face 
         thred load simliaity image bo dyarkrydn ruxsar la wenakany bnkadrau"""
         self.embedding_agent = embedding_agent
+        """"""
         self.database_dir = database_dir
         """ used to save data base folder path"""
         self.threshold = threshold
@@ -45,6 +48,7 @@ class WantedComparisonAgent:
         self.database: List[Tuple[str, np.ndarray, str]] = []
         """ the name of person vector and files"""
         self._load_database()
+        """"""
         """ this all image found and croped and then extract the embedding and then save it in the data base list
         and stored in the data base"""
 

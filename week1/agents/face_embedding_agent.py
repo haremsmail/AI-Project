@@ -14,8 +14,10 @@ class FaceEmbeddingAgent:
 
     def get_embedding(self, face_bgr: np.ndarray) -> np.ndarray:
      
+     
         if face_bgr is None or face_bgr.size == 0:
             raise ValueError("Face image is empty")
+       
 
         # Resize for consistency
         face_resized = cv2.resize(face_bgr, (128, 128), interpolation=cv2.INTER_AREA)

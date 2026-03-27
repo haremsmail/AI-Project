@@ -164,7 +164,7 @@ def main() -> None:
     for face_path, result in all_results:
         status = "MATCH" if result["match"] else "NO MATCH"
         print(f"Face: {Path(face_path).name}")
-        print(f"  Score: {result['score']:.4f} (threshold: {threshold})")
+        print(f"  Score: {result['score']:.4f} -threshold: {threshold:.4f}")
         print(f"  Status: {status}")
         if result["name"]:
             print(f"  Matched: {result['name']}")

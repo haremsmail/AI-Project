@@ -1,4 +1,4 @@
-"""Face detection agent using OpenCV Haar Cascade."""
+
 
 from __future__ import annotations
 
@@ -80,6 +80,8 @@ class FaceDetectionAgent:
                 frame_count += 1
                 """" if the not success stop  and if success face go to lastframe and then"""
                 if frame_count > timeout_seconds * 30:  # ~30 FPS
+
+                    
                     break
                 # Display frame with detections
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -87,6 +89,7 @@ class FaceDetectionAgent:
                 face_rects = self.face_cascade.detectMultiScale(
                     gray, scaleFactor=1.1, minNeighbors=4, minSize=(20, 20)
                 )
+                """ haw mutfh the image size"""
                 for x, y, w, h in face_rects:
                     """ shteky chargosha drust daka"""
                     cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)

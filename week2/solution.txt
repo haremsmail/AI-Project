@@ -1,0 +1,47 @@
+8-Puzzle Solver - Breadth-First Search (BFS)
+==================================================
+
+Initial State:
+ 1  2  3
+ 5  7  6
+ 4  8  .
+
+
+Solution Steps:
+--------------------------------------------------
+
+Step 1 (Cost: 1):
+ 1  2  3
+ 5  7  6
+ 4  .  8
+
+Step 2 (Cost: 1):
+ 1  2  3
+ 5  .  6
+ 4  7  8
+
+Step 3 (Cost: 1):
+ 1  2  3
+ .  5  6
+ 4  7  8
+
+Step 4 (Cost: 1):
+ 1  2  3
+ 4  5  6
+ .  7  8
+
+Step 5 (Cost: 1):
+ 1  2  3
+ 4  5  6
+ 7  .  8
+
+Step 6 (Cost: 1):
+ 1  2  3
+ 4  5  6
+ 7  8  .
+
+
+==================================================
+Total Steps: 6
+Total Cost: 6
+Algorithm: Breadth-First Search (BFS)

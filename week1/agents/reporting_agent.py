@@ -74,8 +74,7 @@ class ReportingAgent:
             report_path = self.reports_dir / report_filename
             
             # Save report
-            with open(report_path, "w") as f:
-                json.dump(report_data, f, indent=2)
+            
             
             logger.info(f"Report saved to {report_path}")
             return str(report_path)

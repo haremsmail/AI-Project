@@ -16,6 +16,7 @@ import imghdr
 import smtplib
 """ used to send email using smtp protocol"""
 from typing import List
+""""""
 
 
 @dataclass
