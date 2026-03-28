@@ -1,6 +1,3 @@
-"""
-Board generation and management for Vacuum Cleaner problem
-"""
 import random
 
 

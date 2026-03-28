@@ -1,6 +1,3 @@
-"""
-DFS Solver for Vacuum Cleaner problem
-"""
 from board import Board
 
 

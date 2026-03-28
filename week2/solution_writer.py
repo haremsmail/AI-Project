@@ -1,6 +1,3 @@
-"""
-Solution writer for Vacuum Cleaner problem
-"""
 import os
 from datetime import datetime
 
