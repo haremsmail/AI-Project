@@ -1,5 +1,5 @@
 @echo off
-REM Launch the Search Algorithms Solver GUI Application
+REM Launch the Vacuum Cleaner DFS Solver GUI Application
 REM This script runs the main.py file in the week2 directory
 
 cd /d "%~dp0"
