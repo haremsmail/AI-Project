@@ -45,7 +45,7 @@ class Board:
         self.grid = [[Board.EMPTY for _ in range(self.width)] for _ in range(self.height)]
         
         
-        # Place vacuum at random position
+        # Place vacuum at random position dd
         self.vacuum_pos = (random.randint(0, self.height-1), random.randint(0, self.width-1))
         """ labar auay arrray start zero bka 0-5 6-1=5 0-5 6-1=5"""
         self.grid[self.vacuum_pos[0]][self.vacuum_pos[1]] = Board.VACUUM
