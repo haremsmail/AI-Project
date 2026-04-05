@@ -1,4 +1,5 @@
 from board import Board
+"""this page is for vacum cleaner problem using depth first search algorithm to find the path from vacuum to dirt and calculate the cost of the path"""
 
 """" used find the path using depth first search algorithm  """
 class Move:
