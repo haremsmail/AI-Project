@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, font
 import threading
-""" runing task in backgroun"""
 from board import Board
 from vacuum_dfs import VacuumDFS
 """" wata import dipth first serach alogoithm"""
