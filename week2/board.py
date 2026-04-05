@@ -1,5 +1,5 @@
 import random
-""" this file create 6*6 bord of puzzle """
+""" this file create 6*6 board of puzzle """
 
 
 class Board:
@@ -21,7 +21,7 @@ class Board:
     """ convert the number to the symbol  numana agar sfr bu daygor ba batal ."""
     
     def __init__(self, width=6, height=6):
-        """ this is have conscutor have bord size   by deffaul 6 by 6"""
+        """ this is conscutor have bord size   by deffaul 6 by 6"""
         self.width = width
         self.height = height
         self.grid = [[Board.EMPTY for _ in range(width)] for _ in range(height)]

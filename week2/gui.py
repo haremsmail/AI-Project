@@ -21,7 +21,7 @@ class VacuumGUI:
     def __init__(self, root):
         """ the root means main window"""
         self.root = root
-        self.root.title("Vacuum Cleaner - DFS Solver")
+        self.root.title("Vacuum Cleaner - DFS Pathfinder")
         self.root.geometry("1200x750")
         """ this is a set of window size"""
         self.root.configure(bg=self.COLORS['bg'])
