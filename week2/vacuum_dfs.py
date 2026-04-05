@@ -1,13 +1,15 @@
 from board import Board
 
-
+"""" used find the path using depth first search algorithm  """
 class Move:
+    """" au class dicrection movment cost dadozetaua"""
+    """ ema deyn pathaka dadozyanauay la regay depth first serrach alogrithm"""
     """Represents a single move"""
     UP = "UP"
     DOWN = "DOWN"
     LEFT = "LEFT"
     RIGHT = "RIGHT"
-    
+    """" nauakana  lagal techuy har julakay  lagal  chon pega dagore katek dajule"""
     COSTS = {
         UP: 2,
         DOWN: 0,

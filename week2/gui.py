@@ -1,13 +1,18 @@
 import tkinter as tk
 from tkinter import messagebox, font
 import threading
+""" runing task in backgroun"""
 from board import Board
 from vacuum_dfs import VacuumDFS
+"""" wata import dipth first serach alogoithm"""
 from solution_writer import SolutionWriter
+"""" au file writrer stepakan pishan dadan"""
 
 
 class VacuumGUI:
+    """ this is type of color hexa"""
     COLORS = {
+        
         'bg': '#0a1628', 'bg_light': '#1a2f5a', 'primary': '#00d4ff',
         'success': '#00ff88', 'danger': '#ff3366', 'warning': '#ffaa00',
         'accent': '#ff00ff', 'vacuum': '#3366ff', 'dirt': '#00dd88',
@@ -15,30 +20,44 @@ class VacuumGUI:
     }
     
     def __init__(self, root):
+        """ the root means main window"""
         self.root = root
         self.root.title("Vacuum Cleaner - DFS Solver")
         self.root.geometry("1200x750")
+        """ this is a set of window size"""
         self.root.configure(bg=self.COLORS['bg'])
-        
+        """ this is used to set background color of the window"""
+        """ used to for background"""
+        """ no bord yet no solver yeat"""
         self.board = self.solver = None
         self.solution_path = []
+        """ store solution steps  au solution path baakar de bo auayduatre stepakan lanau au fila xazn bn """
         self.current_step = self.total_cost = 0
+        """" wata agar dast pe dakay au duana hardukayan sfra"""
         self.solving_in_progress = False
+        """ agar true bu solve daka agar false bu dasty pe nakrdua"""
         
         self.setup_ui()
+        """ call function to create interface lo drustk krndy button gird  """
     
     def setup_ui(self):
         main = tk.Frame(self.root, bg=self.COLORS['bg'])
+        """ orgianize button all thisng group things togoerhter"""
         main.pack(fill=tk.BOTH, expand=True)
+        """ expand wata fround krdna  tell tkinter haw dispaly"""
+        """ pack main width haeight  expand available space"""
         
         # Title
         title = tk.Label(main, text="VACUUM CLEANER", font=("Arial", 28, "bold"),
                         bg=self.COLORS['bg'], fg=self.COLORS['primary'])
         title.pack(pady=15)
+        """ auayan bo zyatkrndy space above and below title"""
         
         # Content
         content = tk.Frame(main, bg=self.COLORS['bg'])
         content.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+        """ au du line conteriank drust daka
+        yakakayan bo contorloer yakayan bo game"""
         
         # Left: Board
         left = tk.Frame(content, bg=self.COLORS['bg'])
@@ -46,18 +65,24 @@ class VacuumGUI:
         
         board_container = tk.Frame(left, bg=self.COLORS['bg_light'], relief=tk.RAISED, bd=3)
         board_container.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        """ addding margina and space
+        bd=3 → border thickness = 3 pixels wata astury stun"""
         
         self.canvas = tk.Canvas(board_container, bg=self.COLORS['empty'],
                                width=420, height=420, highlightthickness=0)
+        """ au drezhe remove border aoutside and canvas drowing hamu shtakan da"""
         self.canvas.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
+        """ canvaas rubary wenakeshanaa lanau border cotnaisner drust dabe"""
         
         # Right: Controls
         right = tk.Frame(content, bg=self.COLORS['bg'], width=280)
         right.pack(side=tk.RIGHT, fill=tk.BOTH, padx=10)
         right.pack_propagate(False)
+        """ mahela prograta sizaka bgore agar gawratrysh u"""
         
-        # Stats
+        # Stats create 3 ui seciton
         for label, ref in [("COST", "cost"), ("STATUS", "status"), ("MOVES", "moves")]:
+            """ wata loop list of tuple har yakayan manay lable ref"""
             tk.Label(right, text=label, font=("Arial", 8), bg=self.COLORS['bg'],
                     fg='white').pack(pady=(10, 2))
             stat = tk.Label(right, text="0" if ref != "status" else "READY",
@@ -65,10 +90,12 @@ class VacuumGUI:
                            fg=self.COLORS[['danger', 'accent', 'warning'][['cost', 'status', 'moves'].index(ref)]])
             stat.pack(pady=(0, 10))
             setattr(self, f'{ref}_label', stat)
+            """ this is used to save label create variable name dynamically  cost_label status_label moves_label"""
         
         # Buttons
         btn_frame = tk.Frame(right, bg=self.COLORS['bg'])
         btn_frame.pack(fill=tk.X)
+        """wata tanya ba arasty x kshany haya"""
         
         buttons = [("⟳ GENERATE", self.generate_board, self.COLORS['primary']),
                   ("⚡ SOLVE", self.solve, self.COLORS['success']),
@@ -80,11 +107,18 @@ class VacuumGUI:
         for txt, cmd, col in buttons:
             tk.Button(btn_frame, text=txt, command=cmd, bg=col, fg='#000', 
                      font=("Arial", 10, "bold"), width=17, relief=tk.FLAT).pack(pady=4)
+            """ button drust daka ba text command lo ruanakrdyn esh krdy funciton """
         
+       
+       
         # Info Panel
+        """ box panel drust daka info"""
         info = tk.Frame(right, bg=self.COLORS['bg_light'], relief=tk.RAISED, bd=2)
         info.pack(fill=tk.X, pady=(15, 0))
-        
+        """ create box panel for information"""
+
+
+
         self.step_label = tk.Label(info, text="Step: 0/0", font=("Arial", 10, "bold"),
                                   bg=self.COLORS['bg_light'], fg=self.COLORS['primary'])
         self.step_label.pack(pady=5)
@@ -93,7 +127,7 @@ class VacuumGUI:
                                   bg=self.COLORS['bg_light'], fg=self.COLORS['accent'])
         self.move_label.pack(pady=5)
         
-        # Legend
+        # Legend explianed of symoble
         tk.Label(info, text="LEGEND", font=("Arial", 10, "bold"),
                 bg=self.COLORS['bg_light'], fg=self.COLORS['primary']).pack(pady=(10, 5))
         
@@ -103,6 +137,7 @@ class VacuumGUI:
                        ("●", self.COLORS['path'], "Current")]
         
         for sym, col, txt in legend_items:
+            """ wata loop for legend item create label for each symbol with color and description"""
             row = tk.Frame(info, bg=self.COLORS['bg_light'])
             row.pack(fill=tk.X, padx=5, pady=2)
             tk.Label(row, text=sym, font=("Arial", 11, "bold"), bg=col,

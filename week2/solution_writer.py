@@ -1,4 +1,5 @@
 import os
+""" means check if clik exist"""
 from datetime import datetime
 
 
@@ -6,11 +7,13 @@ class SolutionWriter:
     """Writes solution to file"""
     
     def __init__(self, filename="solution.txt"):
+        """ this run when object is created"""
         self.filename = filename
     
     def write(self, board, path, total_cost, solution_found, solver):
-        """Write solution to file"""
+        """Write solution to file the solver dfs  solution found true or false have"""
         with open(self.filename, 'w') as f:
+            """ open file for writing"""
             # Header
             f.write("=" * 50 + "\n")
             f.write("VACUUM CLEANER SEARCH PROBLEM SOLUTION\n")
@@ -20,7 +23,12 @@ class SolutionWriter:
             
             # Initial Board
             f.write("INITIAL BOARD:\n")
+            """ section title + initial board layout"""
             f.write(board.to_string() + "\n")
+            """. . V . .
+. # . . .
+. . . G .
+print borad ex"""
             f.write(f"\nBoard Size: {board.height} x {board.width}\n")
             f.write(f"Vacuum Position: {board.vacuum_pos}\n")
             f.write(f"Dirt Position: {board.dirt_pos}\n\n")
@@ -35,10 +43,12 @@ class SolutionWriter:
                 steps = solver.get_path_steps()
                 for step in steps:
                     f.write(step + "\n")
+                    """"  loopek banau codaka dakatu stepakan lanau soluction.txt nyshan dada"""
                 
                 f.write("\n" + "-" * 50 + "\n")
                 f.write(f"TOTAL COST: {total_cost}\n")
                 f.write(f"TOTAL MOVES: {len(path)}\n")
+                """ count numbe3r of moves"""
                 
             else:
                 f.write("NO SOLUTION FOUND!\n")
@@ -50,6 +60,10 @@ class SolutionWriter:
     def read_solution(self):
         """Read solution from file"""
         if os.path.exists(self.filename):
+            """ check daka au file haya  agar habu open daka return content daka
+            """
             with open(self.filename, 'r') as f:
+
                 return f.read()
         return None
+""" agar nabu return none daaka"""
