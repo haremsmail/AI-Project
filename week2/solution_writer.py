@@ -67,3 +67,39 @@ print borad ex"""
                 return f.read()
         return None
 """ agar nabu return none daaka"""
+
+
+
+
+
+
+
+
+
+
+"""
+==================================================
+VACUUM CLEANER SEARCH PROBLEM SOLUTION
+Algorithm: Depth First Search (DFS)
+Generated: 2026-04-05 12:30:00
+
+INITIAL BOARD:
+. . V . .
+. # . . .
+. . . G .
+
+Board Size: 6 x 6
+Vacuum Position: (1,2)
+Dirt Position: (3,3)
+
+SOLUTION FOUND!
+--------------------------------------------------
+
+1. Move RIGHT from (1,2) to (1,3)
+2. Move DOWN from (1,3) to (2,3)
+
+--------------------------------------------------
+TOTAL COST: 3
+TOTAL MOVES: 2
+==================================================
+"""

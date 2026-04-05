@@ -23,6 +23,12 @@ class Move:
         LEFT: (0, -1),
         RIGHT: (0, 1)
     }
+    """" postion chon change dakre katek move dabe
+    (-1, 0)
+
+ New position:
+
+(2-1, 3) = (1, 3)"""
 
 
 class VacuumDFS:
@@ -31,6 +37,7 @@ class VacuumDFS:
     def __init__(self, board):
         self.board = board
         self.visited = set()
+        """ agadary au xanana dabe ka sardan krauan"""
         self.path = []
         self.total_cost = 0
         self.solution_found = False
@@ -44,6 +51,7 @@ class VacuumDFS:
         
         # Try to find path using DFS
         success = self._dfs(start_pos)
+        """ run dfs and return success and fialer return """
         
         if success:
             self.solution_found = True
@@ -55,19 +63,22 @@ class VacuumDFS:
         """DFS recursive function"""
         # Check if we reached the dirt
         if current_pos == self.board.dirt_pos:
+            """ au sheuanay ka ley yacu au sheuany datau xauen bkaya """
             return True
         
         # Mark as visited
         self.visited.add(current_pos)
+        """ au xanay sardny kraua postion golagak"""
         
         # Try all four directions
+        """ hamu arastakan taqy dakata barau sarau darau agar hala bu back"""
         for move_name in [Move.UP, Move.DOWN, Move.LEFT, Move.RIGHT]:
             row, col = current_pos
             dr, dc = Move.DIRECTIONS[move_name]
             new_row, new_col = row + dr, col + dc
             new_pos = (new_row, new_col)
             
-            # Check if position is valid and not visited
+            # Check if position is valid and not visited and not boster
             if (self.board.is_valid_position(new_row, new_col) and 
                 new_pos not in self.visited):
                 
@@ -80,18 +91,20 @@ class VacuumDFS:
                 })
                 self.total_cost += Move.COSTS[move_name]
                 
-                # Recursive call
+                # Recursive call go to the next step
                 if self._dfs(new_pos):
                     return True
                 
                 # Backtrack
+                """ if path fial remove last step abd costs"""
                 self.path.pop()
                 self.total_cost -= Move.COSTS[move_name]
         
         return False
     
     def get_path_steps(self):
-        """Get readable path steps"""
+        """Get readable path steps
+        return list of readable steps for solution path"""
         steps = []
         for i, move_info in enumerate(self.path, 1):
             step = f"{i}. Move {move_info['move']} from {move_info['from']} to {move_info['to']} (Cost: {move_info['cost']})"

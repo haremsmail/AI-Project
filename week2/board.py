@@ -39,6 +39,7 @@ class Board:
         self.dirt_pos = None
         """" bakar de bo zyaytkdny postion hardukayn vacuum w dirt  """
     def generate_random(self, obstacle_count=6):
+        """genearate_random(8)"""
         """" bordeky haramaky drust daak"""
         """Generate random board with vacuum, dirt, and obstacles"""
         # Reset grid
