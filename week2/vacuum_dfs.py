@@ -1,9 +1,10 @@
 from board import Board
+"""this page is for vacum cleaner problem using depth first search algorithm to find the path from vacuum to dirt and calculate the cost of the path"""
 
 """" used find the path using depth first search algorithm  """
 class Move:
-    """" au class dicrection movment cost dadozetaua"""
-    """ ema deyn pathaka dadozyanauay la regay depth first serrach alogrithm"""
+    """" au class direction movement cost dadozetaua"""
+    """ ema deyn pathaka dadozyanauay la regay depth first search alogrithm"""
     """Represents a single move"""
     UP = "UP"
     DOWN = "DOWN"

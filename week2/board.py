@@ -1,5 +1,5 @@
 import random
-""" this file create 6*6 bord of puzzle """
+""" this file create 6*6 board of puzzle """
 
 
 class Board:
@@ -21,7 +21,7 @@ class Board:
     """ convert the number to the symbol  numana agar sfr bu daygor ba batal ."""
     
     def __init__(self, width=6, height=6):
-        """ this is have conscutor have bord size   by deffaul 6 by 6"""
+        """ this is conscutor have bord size   by deffaul 6 by 6"""
         self.width = width
         self.height = height
         self.grid = [[Board.EMPTY for _ in range(width)] for _ in range(height)]
@@ -42,11 +42,11 @@ class Board:
         """genearate_random(8)"""
         """" bordeky haramaky drust daak"""
         """Generate random board with vacuum, dirt, and obstacles"""
-        # Reset grid
+        # Reset grid kkkkk
         self.grid = [[Board.EMPTY for _ in range(self.width)] for _ in range(self.height)]
         
         
-        # Place vacuum at random position
+        # Place vacuum at random position dd
         self.vacuum_pos = (random.randint(0, self.height-1), random.randint(0, self.width-1))
         """ labar auay arrray start zero bka 0-5 6-1=5 0-5 6-1=5"""
         self.grid[self.vacuum_pos[0]][self.vacuum_pos[1]] = Board.VACUUM
