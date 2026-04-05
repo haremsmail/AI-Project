@@ -41,7 +41,7 @@ class Board:
     def generate_random(self, obstacle_count=6):
         """" bordeky haramaky drust daak"""
         """Generate random board with vacuum, dirt, and obstacles"""
-        # Reset grid
+        # Reset grid kkkkk
         self.grid = [[Board.EMPTY for _ in range(self.width)] for _ in range(self.height)]
         
         
