@@ -1,0 +1,351 @@
+"""
+GUI Implementation - Simplified Tkinter interface for A* pathfinding
+Interactive grid-based board to create nodes, draw edges, and run A* algorithm
+"""
+import tkinter as tk
+from tkinter import messagebox
+import math
+from graph import Graph
+from astar import AStarFinder
+
+
+class AStarGUI:
+    """A* Pathfinding GUI using Tkinter"""
+    
+    COLORS = {
+        'bg': '#0a1628', 'bg_light': '#1a2f5a', 'primary': '#00d4ff',
+        'success': '#00ff88', 'danger': '#ff3366', 'warning': '#ffaa00',
+        'node': '#3366ff', 'explored': '#ffaa00', 'path': '#00ff88',
+        'start': '#00d4ff', 'goal': '#ff3366', 'edge': '#666666',
+        'grid': '#333333', 'empty': '#f5f5f5'
+    }
+    
+    def __init__(self, root):
+        self.root = root
+        self.root.title("A* Pathfinding Algorithm")
+        self.root.geometry("1100x700")
+        self.root.configure(bg=self.COLORS['bg'])
+        
+        self.graph = Graph()
+        self.astar = AStarFinder()
+        self.selected_node = None
+        self.start_node = self.goal_node = None
+        self.solution_path = self.explored_nodes = []
+        self.node_positions = {}
+        self.node_radius = 18
+        self.grid_size = 50
+        
+        self._setup_ui()
+    
+    def _setup_ui(self):
+        """Setup the user interface"""
+        # Title
+        tk.Label(self.root, text="A* PATHFINDING", font=("Arial", 24, "bold"),
+                bg=self.COLORS['bg'], fg=self.COLORS['primary']).pack(pady=10)
+        
+        # Main container
+        main = tk.Frame(self.root, bg=self.COLORS['bg'])
+        main.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+        
+        # LEFT - Canvas
+        left = tk.Frame(main, bg=self.COLORS['bg'])
+        left.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        canvas_box = tk.Frame(left, bg=self.COLORS['bg_light'], relief=tk.RAISED, bd=2)
+        canvas_box.pack(fill=tk.BOTH, expand=True)
+        
+        self.canvas = tk.Canvas(canvas_box, bg=self.COLORS['empty'], width=580, height=600, highlightthickness=0)
+        self.canvas.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        self.canvas.bind("<Button-1>", self._on_canvas_click)
+        self.canvas.bind("<Button-3>", lambda e: setattr(self, 'selected_node', None) or self._redraw())
+        
+        self._draw_grid()
+        
+        # RIGHT - Controls
+        right = tk.Frame(main, bg=self.COLORS['bg'], width=250)
+        right.pack(side=tk.RIGHT, fill=tk.BOTH, padx=(10, 0))
+        right.pack_propagate(False)
+        
+        # Input section
+        self._section(right, "ADD NODE")
+        tk.Label(right, text="Name:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
+        self.name_entry = tk.Entry(right, width=20)
+        self.name_entry.pack(padx=10, pady=(0, 5))
+        
+        tk.Label(right, text="X:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
+        self.x_entry = tk.Entry(right, width=20)
+        self.x_entry.pack(padx=10, pady=(0, 5))
+        
+        tk.Label(right, text="Y:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
+        self.y_entry = tk.Entry(right, width=20)
+        self.y_entry.pack(padx=10, pady=(0, 10))
+        
+        self._btn(right, "ADD NODE", self._add_node, self.COLORS['success'])
+        
+        self._section(right, "GRAPH")
+        tk.Label(right, text="Nodes:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
+        self.nodes_label = tk.Label(right, text="0", font=("Arial", 14, "bold"), bg=self.COLORS['bg'], fg=self.COLORS['primary'])
+        self.nodes_label.pack(pady=(0, 10))
+        
+        tk.Label(right, text="Edges:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
+        self.edges_label = tk.Label(right, text="0", font=("Arial", 14, "bold"), bg=self.COLORS['bg'], fg=self.COLORS['warning'])
+        self.edges_label.pack(pady=(0, 10))
+        
+        self._section(right, "A* SEARCH")
+        tk.Label(right, text="Start:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
+        self.start_var = tk.StringVar(value="S")
+        self.start_menu = tk.OptionMenu(right, self.start_var, "S")
+        self.start_menu.config(bg=self.COLORS['node'], fg='white', font=("Arial", 8), width=20)
+        self.start_menu.pack(fill=tk.X, padx=10, pady=(0, 5))
+        
+        tk.Label(right, text="Goal:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
+        self.goal_var = tk.StringVar(value="G")
+        self.goal_menu = tk.OptionMenu(right, self.goal_var, "G")
+        self.goal_menu.config(bg=self.COLORS['goal'], fg='white', font=("Arial", 8), width=20)
+        self.goal_menu.pack(fill=tk.X, padx=10, pady=(0, 10))
+        
+        self._btn(right, "FIND PATH", self._solve, self.COLORS['primary'])
+        
+        self._section(right, "RESULTS")
+        tk.Label(right, text="Path:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
+        self.path_label = tk.Label(right, text="—", font=("Arial", 8), bg=self.COLORS['bg'], 
+                                   fg=self.COLORS['warning'], wraplength=220)
+        self.path_label.pack(pady=(0, 5), padx=10)
+        
+        tk.Label(right, text="Cost:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
+        self.cost_label = tk.Label(right, text="0", font=("Arial", 12, "bold"), bg=self.COLORS['bg'], fg=self.COLORS['success'])
+        self.cost_label.pack(pady=(0, 5))
+        
+        tk.Label(right, text="Explored:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
+        self.explored_label = tk.Label(right, text="0", font=("Arial", 12, "bold"), bg=self.COLORS['bg'], fg=self.COLORS['explored'])
+        self.explored_label.pack(pady=(0, 10))
+        
+        # Action buttons
+        btn_frame = tk.Frame(right, bg=self.COLORS['bg'])
+        btn_frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        tk.Button(btn_frame, text="SAMPLE", font=("Arial", 8, "bold"), bg=self.COLORS['primary'], fg='black',
+                 command=self._load_sample, relief=tk.RAISED).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 3))
+        tk.Button(btn_frame, text="DETAILS", font=("Arial", 8, "bold"), bg=self.COLORS['warning'], fg='black',
+                 command=self._show_details, relief=tk.RAISED).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=3)
+        tk.Button(btn_frame, text="RESET", font=("Arial", 8, "bold"), bg=self.COLORS['danger'], fg='white',
+                 command=self._reset, relief=tk.RAISED).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(3, 0))
+    
+    def _section(self, parent, title):
+        """Create section separator"""
+        tk.Frame(parent, bg=self.COLORS['bg_light'], height=1).pack(fill=tk.X, padx=10, pady=8)
+        tk.Label(parent, text=title, font=("Arial", 10, "bold"), bg=self.COLORS['bg'], 
+                fg=self.COLORS['primary']).pack(anchor=tk.W, padx=10, pady=(5, 10))
+    
+    def _btn(self, parent, text, cmd, color):
+        """Create button"""
+        tk.Button(parent, text=text, font=("Arial", 9, "bold"), bg=color, 
+                 fg='black' if color != self.COLORS['danger'] else 'white',
+                 command=cmd, relief=tk.RAISED, bd=1).pack(fill=tk.X, padx=10, pady=5)
+    
+    def _draw_grid(self):
+        """Draw grid"""
+        for x in range(0, 600, self.grid_size):
+            self.canvas.create_line(x, 0, x, 600, fill=self.COLORS['grid'])
+        for y in range(0, 600, self.grid_size):
+            self.canvas.create_line(0, y, 600, y, fill=self.COLORS['grid'])
+    
+    def _add_node(self):
+        """Add node"""
+        try:
+            name = self.name_entry.get().strip()
+            x, y = float(self.x_entry.get()), float(self.y_entry.get())
+            
+            if not name or x < 0 or x > 10 or y < 0 or y > 10:
+                messagebox.showerror("Error", "Invalid input")
+                return
+            
+            if self.graph.get_node(name):
+                messagebox.showerror("Error", f"Node '{name}' exists")
+                return
+            
+            self.graph.add_node(name, x, y)
+            self.node_positions[name] = (x * self.grid_size, y * self.grid_size)
+            self.name_entry.delete(0, tk.END)
+            self.x_entry.delete(0, tk.END)
+            self.y_entry.delete(0, tk.END)
+            self._redraw()
+            self._update_dropdowns()
+        except ValueError:
+            messagebox.showerror("Error", "Enter valid numbers")
+    
+    def _redraw(self):
+        """Redraw canvas"""
+        self.canvas.delete("all")
+        self._draw_grid()
+        
+        # Draw edges
+        for node in self.graph.get_all_nodes():
+            for neighbor in node.neighbors:
+                if node.name < neighbor.name:
+                    x1, y1 = self.node_positions.get(node.name, (0, 0))
+                    x2, y2 = self.node_positions.get(neighbor.name, (0, 0))
+                    is_in_path = (len(self.solution_path) > 1 and node.name in self.solution_path and 
+                                 neighbor.name in self.solution_path and 
+                                 abs(self.solution_path.index(node.name) - self.solution_path.index(neighbor.name)) == 1)
+                    self.canvas.create_line(x1, y1, x2, y2, fill=self.COLORS['path'] if is_in_path else self.COLORS['edge'], 
+                                           width=3 if is_in_path else 1)
+        
+        # Draw nodes
+        for node in self.graph.get_all_nodes():
+            x, y = self.node_positions.get(node.name, (0, 0))
+            
+            if node.name == self.start_node:
+                color = self.COLORS['start']
+            elif node.name == self.goal_node:
+                color = self.COLORS['goal']
+            elif node.name in self.solution_path:
+                color = self.COLORS['path']
+            elif node.name in self.explored_nodes:
+                color = self.COLORS['explored']
+            else:
+                color = self.COLORS['node']
+            
+            self.canvas.create_oval(x - self.node_radius, y - self.node_radius, 
+                                   x + self.node_radius, y + self.node_radius, fill=color, outline='white', width=2)
+            self.canvas.create_text(x, y, text=node.name, font=("Arial", 11, "bold"), fill='white')
+        
+        self.nodes_label.config(text=str(self.graph.get_node_count()))
+        self.edges_label.config(text=str(self.graph.get_edge_count()))
+    
+    def _on_canvas_click(self, event):
+        """Handle canvas click"""
+        clicked = self._get_node_at(event.x, event.y)
+        if not clicked:
+            return
+        
+        if not self.selected_node:
+            self.selected_node = clicked
+        elif self.selected_node == clicked:
+            self.selected_node = None
+        else:
+            self.graph.add_edge(self.selected_node, clicked, bidirectional=False)
+            self.selected_node = None
+            self._redraw()
+            self._update_dropdowns()
+    
+    def _get_node_at(self, x, y):
+        """Get node at position"""
+        for name, (nx, ny) in self.node_positions.items():
+            if math.sqrt((x - nx)**2 + (y - ny)**2) <= self.node_radius:
+                return name
+        return None
+    
+    def _update_dropdowns(self):
+        """Update dropdowns"""
+        names = [n.name for n in self.graph.get_all_nodes()]
+        
+        self.start_menu["menu"].delete(0, tk.END)
+        for name in names:
+            self.start_menu["menu"].add_command(label=name, command=lambda n=name: self.start_var.set(n))
+        
+        self.goal_menu["menu"].delete(0, tk.END)
+        for name in names:
+            self.goal_menu["menu"].add_command(label=name, command=lambda n=name: self.goal_var.set(n))
+        
+        if names:
+            self.start_var.set(names[0])
+            self.goal_var.set(names[-1])
+    
+    def _solve(self):
+        """Run A* algorithm"""
+        start = self.graph.get_node(self.start_var.get())
+        goal = self.graph.get_node(self.goal_var.get())
+        
+        if not start or not goal:
+            messagebox.showerror("Error", "Select valid nodes")
+            return
+        
+        self.graph.reset_all_costs()
+        self.start_node = start.name
+        self.goal_node = goal.name
+        self.solution_path, self.explored_nodes, cost = self.astar.find_path(start, goal)
+        
+        if self.solution_path:
+            self.path_label.config(text=" → ".join(self.solution_path), fg=self.COLORS['success'])
+            self.cost_label.config(text=f"{cost:.2f}")
+        else:
+            self.path_label.config(text="No path!", fg=self.COLORS['danger'])
+            self.cost_label.config(text="∞")
+        
+        self.explored_label.config(text=str(len(self.explored_nodes)))
+        self._redraw()
+    
+    def _show_details(self):
+        """Show details"""
+        if not self.explored_nodes:
+            messagebox.showinfo("Info", "Run A* first")
+            return
+        
+        win = tk.Toplevel(self.root)
+        win.title("A* Details")
+        win.geometry("500x400")
+        win.configure(bg=self.COLORS['bg'])
+        
+        tk.Label(win, text="EXPLORATION LOG", font=("Arial", 12, "bold"),
+                bg=self.COLORS['bg'], fg=self.COLORS['primary']).pack(pady=5)
+        
+        frame = tk.Frame(win, bg=self.COLORS['bg'])
+        frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        scroll = tk.Scrollbar(frame)
+        scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        text = tk.Text(frame, bg=self.COLORS['bg_light'], fg='white', font=("Courier", 8),
+                      yscrollcommand=scroll.set, relief=tk.FLAT, bd=0)
+        text.pack(fill=tk.BOTH, expand=True)
+        scroll.config(command=text.yview)
+        
+        text.insert(tk.END, f"Start: {self.start_node} | Goal: {self.goal_node}\n")
+        text.insert(tk.END, f"Path: {' → '.join(self.solution_path) if self.solution_path else 'None'}\n")
+        text.insert(tk.END, f"Cost: {self.astar.total_cost:.2f} | Explored: {len(self.explored_nodes)}\n\n")
+        text.insert(tk.END, "=" * 40 + "\n\n")
+        
+        for i, node_name in enumerate(self.explored_nodes, 1):
+            node = self.graph.get_node(node_name)
+            text.insert(tk.END, f"{i}. {node_name} at ({node.x}, {node.y})\n   g={node.g:.2f} h={node.h:.2f} f={node.f:.2f}\n\n")
+        
+        text.config(state=tk.DISABLED)
+    
+    def _reset(self):
+        """Reset"""
+        self.graph.clear()
+        self.solution_path = self.explored_nodes = []
+        self.node_positions.clear()
+        self.start_node = self.goal_node = self.selected_node = None
+        self.name_entry.delete(0, tk.END)
+        self.x_entry.delete(0, tk.END)
+        self.y_entry.delete(0, tk.END)
+        self._redraw()
+        self._update_dropdowns()
+    
+    def _load_sample(self):
+        """Load sample"""
+        self._reset()
+        
+        nodes = [("S", 0, 0), ("A", 1, 2), ("B", 2, 1), ("C", 3, 3), ("G", 5, 5)]
+        edges = [("S", "A"), ("S", "B"), ("A", "C"), ("B", "C"), ("C", "G")]
+        
+        for name, x, y in nodes:
+            self.graph.add_node(name, x, y)
+            self.node_positions[name] = (x * self.grid_size, y * self.grid_size)
+        
+        for n1, n2 in edges:
+            self.graph.add_edge(n1, n2, bidirectional=False)
+        
+        self.start_var.set("S")
+        self.goal_var.set("G")
+        self._redraw()
+        messagebox.showinfo("Sample Loaded", "S→A, S→B, A→C, B→C, C→G")
+
+
+def main():
+    """Main entry"""
+    root = tk.Tk()
+    gui = AStarGUI(root)
+    root.mainloop()
