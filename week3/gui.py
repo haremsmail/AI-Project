@@ -180,15 +180,14 @@ class AStarGUI:
         # Draw edges
         for node in self.graph.get_all_nodes():
             for neighbor in node.neighbors:
-                if node.name < neighbor.name:
-                    x1, y1 = self.positions.get(node.name, (0, 0))
-                    x2, y2 = self.positions.get(neighbor.name, (0, 0))
-                    is_path = (len(self.solution_path) > 1 and node.name in self.solution_path and 
-                              neighbor.name in self.solution_path and 
-                              abs(self.solution_path.index(node.name) - self.solution_path.index(neighbor.name)) == 1)
-                    color = self.COLORS['green'] if is_path else self.COLORS['gray']
-                    width = 3 if is_path else 1
-                    self.canvas.create_line(x1, y1, x2, y2, fill=color, width=width)
+                x1, y1 = self.positions.get(node.name, (0, 0))
+                x2, y2 = self.positions.get(neighbor.name, (0, 0))
+                is_path = (len(self.solution_path) > 1 and node.name in self.solution_path and 
+                          neighbor.name in self.solution_path and 
+                          abs(self.solution_path.index(node.name) - self.solution_path.index(neighbor.name)) == 1)
+                color = self.COLORS['green'] if is_path else self.COLORS['gray']
+                width = 3 if is_path else 1
+                self.canvas.create_line(x1, y1, x2, y2, fill=color, width=width)
         
         # Draw nodes
         for node in self.graph.get_all_nodes():
