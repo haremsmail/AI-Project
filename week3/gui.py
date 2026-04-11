@@ -1,15 +1,15 @@
-"""
-GUI Implementation - Simple Tkinter interface for A* pathfinding
-"""
+
 import tkinter as tk
 from tkinter import messagebox
+""" bakar de bo pishandany alertek yan shtek"""
 import math
 from graph import Graph
+""" implmenty grafh class kraua"""
 from astar import AStarFinder
-
+""""""
 
 class AStarGUI:
-    """A* Pathfinding GUI"""
+    
     
     COLORS = {
         'bg': '#0a1628', 'light': '#1a2f5a', 'cyan': '#00d4ff',
@@ -19,18 +19,24 @@ class AStarGUI:
     
     def __init__(self, root):
         self.root = root
+        """root = tk.Tk()"""
         self.root.title("A* Pathfinding")
-        self.root.geometry("1100x700")
+        self.root.geometry("1100x1000")
         self.root.configure(bg=self.COLORS['bg'])
+        """auayan bo backgorund color"""
         
         self.graph = Graph()
         self.astar = AStarFinder()
         self.selected_node = None
         self.start_node = self.goal_node = None
+        """ start node nody daspekrdn goal node au noday pe dagay"""
         self.solution_path = self.explored_nodes = []
         self.positions = {}
+        """auayan story au nodana daka ka drow dakren"""
         self.radius = 18
+        """ auayn size har nodeka"""
         self.grid_size = 50
+        """ auayn space newuan nodakan"""
         
         self.setup_ui()
     
@@ -38,8 +44,10 @@ class AStarGUI:
         """Setup interface"""
         tk.Label(self.root, text="A* PATHFINDING", font=("Arial", 24, "bold"),
                 bg=self.COLORS['bg'], fg=self.COLORS['cyan']).pack(pady=10)
+        """ create big title daka la top"""
         
         main = tk.Frame(self.root, bg=self.COLORS['bg'])
+        """ auayn bo drusktnry contianer yaxud waku boxeka"""
         main.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
         
         # Canvas (left)
@@ -47,59 +55,74 @@ class AStarGUI:
         left.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
         canvas_frame = tk.Frame(left, bg=self.COLORS['light'], relief=tk.RAISED, bd=2)
+        """ auayn snureky barz krau dadat bd wata astury stun"""
         canvas_frame.pack(fill=tk.BOTH, expand=True)
         
-        self.canvas = tk.Canvas(canvas_frame, bg='#f5f5f5', width=580, height=600, highlightthickness=0)
+        self.canvas = tk.Canvas(canvas_frame, bg='#f5f5f5', width=580, height=500, highlightthickness=0)
+        """ lerada ka hamu shtek keshra Apathing edge node au ana  hilightthinkes space outline"""
         self.canvas.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         self.canvas.bind("<Button-1>", self.on_click)
         self.canvas.bind("<Button-3>", lambda e: setattr(self, 'selected_node', None) or self.redraw())
+        """" au du button lo select krdny node bakar de ca clcikt labutton 3 krd dubara rdrow cnavas daka
+        """
+
+        """ simple canvas what is it drow graph"""
         
         self.draw_grid()
+        """ drow backgorund gird of canvase"""
         
         # Controls (right)
         right = tk.Frame(main, bg=self.COLORS['bg'], width=250)
         right.pack(side=tk.RIGHT, fill=tk.BOTH, padx=(10, 0))
+        """ padx space from left side"""
         right.pack_propagate(False)
+        """ regry daka la goryny qabaraka"""
         
         # Add node section
         self.section(right, "ADD NODE")
         tk.Label(right, text="Name:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
         self.name_entry = tk.Entry(right, width=20)
-        self.name_entry.pack(padx=10, pady=(0, 3))
+        self.name_entry.pack(padx=10, pady=(0, 2))
         
         tk.Label(right, text="X:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
         self.x_entry = tk.Entry(right, width=20)
-        self.x_entry.pack(padx=10, pady=(0, 3))
+        self.x_entry.pack(padx=10, pady=(0, 2))
         
         tk.Label(right, text="Y:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
         self.y_entry = tk.Entry(right, width=20)
-        self.y_entry.pack(padx=10, pady=(0, 5))
+        self.y_entry.pack(padx=10, pady=(0, 3))
         
         self.button(right, "ADD NODE", self.add_node, self.COLORS['green'])
+        """ agar click le krd bangy funciton add-nde hq4 lq ril3 tui"""
+
         
-        # Graph stats
+
+        # Graph stats auayn riight node edgt
         self.section(right, "GRAPH")
         tk.Label(right, text="Nodes:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
         self.nodes_label = tk.Label(right, text="0", font=("Arial", 14, "bold"), bg=self.COLORS['bg'], fg=self.COLORS['cyan'])
-        self.nodes_label.pack(pady=(0, 8))
+        self.nodes_label.pack(pady=(0, 4))
         
         tk.Label(right, text="Edges:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
         self.edges_label = tk.Label(right, text="0", font=("Arial", 14, "bold"), bg=self.COLORS['bg'], fg=self.COLORS['orange'])
-        self.edges_label.pack(pady=(0, 8))
+        self.edges_label.pack(pady=(0, 4))
+        """ duatr la regay function auana zyadu kam dakan"""
         
         # A* search
         self.section(right, "A* SEARCH")
+        """ postion right aserach pishan dada la bottom"""
         tk.Label(right, text="Start:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
         self.start_var = tk.StringVar(value="S")
         self.start_menu = tk.OptionMenu(right, self.start_var, "S")
         self.start_menu.config(bg=self.COLORS['blue'], fg='white', font=("Arial", 8), width=20)
-        self.start_menu.pack(fill=tk.X, padx=10, pady=(0, 3))
+        self.start_menu.pack(fill=tk.X, padx=10, pady=(0, 2))
         
         tk.Label(right, text="Goal:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
         self.goal_var = tk.StringVar(value="G")
         self.goal_menu = tk.OptionMenu(right, self.goal_var, "G")
         self.goal_menu.config(bg=self.COLORS['red'], fg='white', font=("Arial", 8), width=20)
-        self.goal_menu.pack(fill=tk.X, padx=10, pady=(0, 8))
+        self.goal_menu.pack(fill=tk.X, padx=10, pady=(0, 3))
+        """ place on ui tk.x basheuy asoy keshanh"""
         
         self.button(right, "FIND PATH", self.solve, self.COLORS['cyan'])
         
@@ -108,15 +131,16 @@ class AStarGUI:
         tk.Label(right, text="Path:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
         self.path_label = tk.Label(right, text="—", font=("Arial", 8), bg=self.COLORS['bg'], 
                                    fg=self.COLORS['orange'], wraplength=220)
-        self.path_label.pack(pady=(0, 3), padx=10)
+        self.path_label.pack(pady=(0, 1), padx=10)
         
         tk.Label(right, text="Cost:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
         self.cost_label = tk.Label(right, text="0", font=("Arial", 12, "bold"), bg=self.COLORS['bg'], fg=self.COLORS['green'])
-        self.cost_label.pack(pady=(0, 3))
+        self.cost_label.pack(pady=(0, 1))
         
         tk.Label(right, text="Explored:", bg=self.COLORS['bg'], fg='white', font=("Arial", 9)).pack(anchor=tk.W, padx=10)
+        """ wata zhmary nodakan pesh aauya to bashtryn path halbzhery"""
         self.explored_label = tk.Label(right, text="0", font=("Arial", 12, "bold"), bg=self.COLORS['bg'], fg=self.COLORS['orange'])
-        self.explored_label.pack(pady=(0, 8))
+        self.explored_label.pack(pady=(0, 3))
         
         # Action buttons
         btn_frame = tk.Frame(right, bg=self.COLORS['bg'])
@@ -129,36 +153,50 @@ class AStarGUI:
         tk.Button(btn_frame, text="RESET", font=("Arial", 8, "bold"), bg=self.COLORS['red'], fg='white',
                  command=self.reset, relief=tk.RAISED).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(3, 0))
     
+
+
+    """ bo zyad krdny seciton nweya"""
     def section(self, parent, title):
+        """ two parameter parent location title shtakas"""
         """Section separator"""
-        tk.Frame(parent, bg=self.COLORS['light'], height=1).pack(fill=tk.X, padx=10, pady=8)
+        tk.Frame(parent, bg=self.COLORS['light'], height=1).pack(fill=tk.X, padx=10, pady=3)
         tk.Label(parent, text=title, font=("Arial", 10, "bold"), bg=self.COLORS['bg'], 
-                fg=self.COLORS['cyan']).pack(anchor=tk.W, padx=10, pady=(3, 8))
+                fg=self.COLORS['cyan']).pack(anchor=tk.W, padx=10, pady=(1, 3))
     
     def button(self, parent, text, cmd, color):
+        """ auay yakam location auay tr texty button auay tr agar click krd chbka"""
         """Create button"""
         tk.Button(parent, text=text, font=("Arial", 9, "bold"), bg=color, 
                  fg='black' if color != self.COLORS['red'] else 'white',
+                 
                  command=cmd, relief=tk.RAISED, bd=1).pack(fill=tk.X, padx=10, pady=5)
-    
+    """ agar  button red nabu text black agar red bu text white"""
+    """ auayan mabasty auay 50 50 brtua"""
     def draw_grid(self):
         """Draw grid"""
+        """ drow line verticka horizton """
         for x in range(0, 600, self.grid_size):
+          
             self.canvas.create_line(x, 0, x, 600, fill=self.COLORS['grid'])
         for y in range(0, 600, self.grid_size):
             self.canvas.create_line(0, y, 600, y, fill=self.COLORS['grid'])
-    
+                  
+
+
     def add_node(self):
         """Add node"""
         try:
             name = self.name_entry.get().strip()
+            """ data la input warbgra space la bda"""
             x, y = float(self.x_entry.get()), float(self.y_entry.get())
             
             if not name or x < 0 or x > 10 or y < 0 or y > 10:
+                """ nabe be name be dabe la 0 lo 10 bo xu ya"""
                 messagebox.showerror("Error", "Invalid input")
                 return
             
             if self.graph.get_node(name):
+                """ agar node aleady exits bu erro dada"""
                 messagebox.showerror("Error", f"Node '{name}' exists")
                 return
             
@@ -167,11 +205,14 @@ class AStarGUI:
             self.name_entry.delete(0, tk.END)
             self.x_entry.delete(0, tk.END)
             self.y_entry.delete(0, tk.END)
+            """ clear  input daka bo auay nodeky tr daxl bkay"""
             self.redraw()
             self.update_dropdowns()
         except ValueError:
             messagebox.showerror("Error", "Enter valid numbers")
     
+
+    """ lerar ra auastm"""
     def redraw(self):
         """Redraw canvas"""
         self.canvas.delete("all")
