@@ -2,7 +2,7 @@
 from heapq import heappush, heappop
 """ this heap used for priority queue in A* algorithm"""
 
-
+"""---"""
 class AStarFinder:
     """A* pathfinding algorithm"""
     
