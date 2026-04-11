@@ -214,25 +214,38 @@ class AStarGUI:
 
     """ lerar ra auastm"""
     def redraw(self):
+        """" auayan ba kard e bo refresh kranayy hamu sht lanau canvas"""
         """Redraw canvas"""
         self.canvas.delete("all")
         self.draw_grid()
+
+
         
         # Draw edges
         for node in self.graph.get_all_nodes():
+            """ drustkrndy line ba hamu greaky nodakan teparent"""
             for neighbor in node.neighbors:
+                """ loop laragey jiranakanaua"""
+
                 x1, y1 = self.positions.get(node.name, (0, 0))
+                """ auayn current nod auay ley ham nauy node lagak postion agar nabu default 0,0 wardagre"""
                 x2, y2 = self.positions.get(neighbor.name, (0, 0))
+                """ auayan nody duam ka konty dakay"""
                 is_path = (len(self.solution_path) > 1 and node.name in self.solution_path and 
                           neighbor.name in self.solution_path and 
                           abs(self.solution_path.index(node.name) - self.solution_path.index(neighbor.name)) == 1)
                 color = self.COLORS['green'] if is_path else self.COLORS['gray']
+                """ dabe soluction path garuart be laya harduk nodaka lanau au patha bunyan habe  diffrenakash
+                mabasty auaya ka dabe nodey duay xoy be """
                 width = 3 if is_path else 1
+                """ auashayn bo thinkess depend on path"""
                 self.canvas.create_line(x1, y1, x2, y2, fill=color, width=width)
         
         # Draw nodes
         for node in self.graph.get_all_nodes():
+            """loop daka basr hamu node"""
             x, y = self.positions.get(node.name, (0, 0))
+            """ x,y dadpz"""
             
             if node.name == self.start_node:
                 color = self.COLORS['cyan']
@@ -241,20 +254,27 @@ class AStarGUI:
             elif node.name in self.solution_path:
                 color = self.COLORS['green']
             elif node.name in self.explored_nodes:
+                """ au nodanay la katy garan lekolynauy lasar krabe"""
                 color = self.COLORS['orange']
             else:
                 color = self.COLORS['blue']
             
             self.canvas.create_oval(x - self.radius, y - self.radius, 
                                    x + self.radius, y + self.radius, fill=color, outline='white', width=2)
+            """ drow a circle node"""
             self.canvas.create_text(x, y, text=node.name, font=("Arial", 11, "bold"), fill='white')
+            """agadary aua texty nau nodakay"""
         
         self.nodes_label.config(text=str(self.graph.get_node_count()))
         self.edges_label.config(text=str(self.graph.get_edge_count()))
+        """ updated lable node edigth auayan zhmary node lagal edge"""
     
     def on_click(self, event):
+        """ bo drust krndy line lanauen harduk node"""
+        """ auayan drop dawn menu  katek click le dakay"""
         """Handle click"""
         clicked = self.get_node_at(event.x, event.y)
+        """ x,y lanau event """
         if not clicked:
             return
         
@@ -262,63 +282,87 @@ class AStarGUI:
             self.selected_node = clicked
         elif self.selected_node == clicked:
             self.selected_node = None
+            """auayn user click dka la diffrent node agar haman click lebka disclick"""
         else:
             self.graph.add_edge(self.selected_node, clicked, bidirectional=False)
+            """ agar du node connect bua"""
             self.selected_node = None
             self.redraw()
             self.update_dropdowns()
+            """ agaretau by default bary jarnay xoy"""
     
+
+
     def get_node_at(self, x, y):
-        """Get node at position"""
+
+        """Get node at position wata clickt lasar kam node krdua"""
         for name, (nx, ny) in self.positions.items():
             if math.sqrt((x - nx)**2 + (y - ny)**2) <= self.radius:
                 return name
+            """ auayan distance newaun nodakan calclualte daka agar lanau baznaka clickt kr au dagarentya"""
         return None
+    """ wata agar clicl lanau bazna ka krdny return nod edaka agar na return hich"""
     
     def update_dropdowns(self):
         """Update menus"""
         names = [n.name for n in self.graph.get_all_nodes()]
         
         self.start_menu["menu"].delete(0, tk.END)
+        """ auayn remove old item daka"""
         for name in names:
             self.start_menu["menu"].add_command(label=name, command=lambda n=name: self.start_var.set(n))
-        
+     
         self.goal_menu["menu"].delete(0, tk.END)
+        """ agar clikc la satr kra option bgor"""
+        """ clieaer goal """
         for name in names:
             self.goal_menu["menu"].add_command(label=name, command=lambda n=name: self.goal_var.set(n))
         
         if names:
             self.start_var.set(names[0])
+            """ wata agr node habu fifst statt  axir goal"""
             self.goal_var.set(names[-1])
     
+
+
+
     def solve(self):
         """Run A*"""
+        """ wata agar click la button find path aua esh"""
         start = self.graph.get_node(self.start_var.get())
+
         goal = self.graph.get_node(self.goal_var.get())
+
         
         if not start or not goal:
             messagebox.showerror("Error", "Select valid nodes")
             return
         
         self.graph.reset_all_costs()
+        """ reet costu """
         self.start_node = start.name
         self.goal_node = goal.name
         self.solution_path, self.explored_nodes, cost = self.astar.find_path(start, goal)
-        
+        """ explored node au nodaya ka hamu pishan dad"""
         if self.solution_path:
             self.path_label.config(text=" → ".join(self.solution_path), fg=self.COLORS['green'])
             self.cost_label.config(text=f"{cost:.2f}")
+            """ auayan boo pishan dnay costu paht"""
         else:
             self.path_label.config(text="No path!", fg=self.COLORS['red'])
             self.cost_label.config(text="∞")
         
         self.explored_label.config(text=str(len(self.explored_nodes)))
         self.redraw()
+        """ zhmary au nodanay ka haya hamuy pishan dada"""
     
+
+
     def show_details(self):
         """Show details"""
         if not self.explored_nodes:
             messagebox.showinfo("Info", "Run A* first")
+            """ masseg box psihan da"""
             return
         
         win = tk.Toplevel(self.root)
@@ -350,6 +394,10 @@ class AStarGUI:
             text.insert(tk.END, f"{i}. {node_name} at ({node.x}, {node.y})\n   g={node.g:.2f} h={node.h:.2f} f={node.f:.2f}\n\n")
         
         text.config(state=tk.DISABLED)
+        """g → cost from Start to current node
+h → estimated distance to Goal
+f → total score
+👉 f = g + h"""
     
     def reset(self):
         """Reset"""

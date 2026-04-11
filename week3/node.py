@@ -11,9 +11,13 @@ class Node:
         self.x = x
         self.y = y
         self.neighbors = []
-        self.g = float('inf')
+        self.g = float('inf') 
+        """ real distance from start to currnet node"""
+        """ cost from start to t this node  deffualt inf"""
         self.h = 0
+        """ h distance to agel"""
         self.f = float('inf')
+        
         self.parent = None
         
     def add_neighbor(self, neighbor_node):
@@ -44,18 +48,22 @@ class Node:
         self.h = 0
         self.f = float('inf')
         self.parent = None
+        """ used to reset all cost in a algoriht"""
     
     def __lt__(self, other):
         """Compare by f cost"""
         return self.f < other.f
+    """ smaller is better a valuey bchture bu """
     
     def __eq__(self, other):
         """Check if same node"""
         if isinstance(other, Node):
             return self.name == other.name
         return False
+    """ auayn check daka ka aya du node yskann yan na"""
     
     def __hash__(self):
         """Hash for use in sets"""
         return hash(self.name)
+    """ yahni lanauanay nauy ai bkata hashed"""
 
