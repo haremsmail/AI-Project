@@ -51,7 +51,6 @@ class AStarFinder:
                 """ rebuild path nmuna agar g,s,b, daygore s,b,g"""
                 """ agar current node goal bu buasta la serach krdn"""
                 self.total_cost = current_node.g
-                """ total cost g balue"""
                 return self.path, self.exploration_order, self.total_cost
             
             for neighbor in current_node.neighbors:
