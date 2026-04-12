@@ -54,7 +54,7 @@ class AStarFinder:
                 return self.path, self.exploration_order, self.total_cost
             
             for neighbor in current_node.neighbors:
-                """ for current node check allnode connected"""
+                """ for current node check all node connected"""
                 if neighbor.name in self.closed_list:
                     """ agar jiranakay haman node ka chuy boy ignoty kba"""
                     continue
