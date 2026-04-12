@@ -35,10 +35,10 @@ class AStarFinder:
         """ add start node to the priority queue with f cost and unique id"""
         while self.open_list:
             """ au loop step by step esh daka lo dozyanauy best path"""
-            _, _, current_node = heappop(self.open_list)
-            """ teakes best node push priority que  au du batala f ,id"""
+            _f_cost, _node_id, current_node = heappop(self.open_list)
+            """ takes best node push priority que  au du batala f ,id"""
             
-            """ agar alerady lanau priority queu habu skip bka"""
+            """ agar already lanau priority queue habu skip bka"""
             if current_node.name in self.closed_list:
             
                 continue

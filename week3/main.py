@@ -1,6 +1,6 @@
 """
-Main Entry Point - A* Pathfinding Application
-Launches the interactive GUI application
+Main entry point for the A* Pathfinding application.
+Run this file to launch the interactive GUI.
 """
 from gui import main
 
