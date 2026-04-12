@@ -1,7 +1,7 @@
 """Node class for A* graph"""
 import math
 
-
+"""Node class for A* graph"""
 class Node:
     """Node in graph for A* pathfinding"""
     
