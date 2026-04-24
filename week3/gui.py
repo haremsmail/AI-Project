@@ -124,6 +124,7 @@ class AStarGUI:
         self.goal_menu.pack(fill=tk.X, padx=10, pady=(0, 3))
         """ place on ui tk.x basheuy asoy keshanh"""
         
+        
         self.button(right, "FIND PATH", self.solve, self.COLORS['cyan'])
         
         # Results
@@ -303,6 +304,7 @@ class AStarGUI:
         return None
     """ wata agar clicl lanau bazna ka krdny return nod edaka agar na return hich"""
     
+    
     def update_dropdowns(self):
         """Update menus"""
         names = [n.name for n in self.graph.get_all_nodes()]
@@ -415,7 +417,7 @@ f → total score
         """Load sample"""
         self.reset()
         
-        nodes = [("S", 0, 0), ("A", 1, 2), ("B", 2, 1), ("C", 3, 3), ("G", 5, 5)]
+        nodes = [("S", 0, 0), ("A", 1, 2), ("B", 2, 5), ("C", 3, 3), ("G", 5, 5)]
         edges = [("S", "A"), ("S", "B"), ("A", "C"), ("B", "C"), ("C", "G")]
         
         for name, x, y in nodes:
