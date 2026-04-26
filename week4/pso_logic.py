@@ -83,6 +83,8 @@ class Particle:
         """
         self.x += self.vx
         self.y += self.vy
+        self.x = max(0, min(620, self.x))
+        self.y = max(0, min(650, self.y))
     
     def get_speed(self):
         """ wata tanlokaka chand xera dajuey"""
