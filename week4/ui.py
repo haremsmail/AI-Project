@@ -21,15 +21,18 @@ class PSOApp:
         self.iteration = 0
         self.history = []
         self.global_best = (0, 0, float('inf'))
+        """ gloable wata x postion y postion"""
         self._build_ui()
 
     def _build_ui(self):
         self.canvas = tk.Canvas(self.root, width=620, height=650, bg="#181825", 
                                highlightthickness=1, highlightbackground="#45475a")
+        """ au du parametery kotay borderthinkess bordercoloer"""
         self.canvas.place(x=10, y=10)
         
         ctrl = tk.Frame(self.root, bg="#1e1e2e")
         ctrl.place(x=650, y=10, width=340, height=680)
+        """ x,y mabasty move right lefta"""
         
         ttk.Label(ctrl, text="PSO Parameters").pack(pady=5)
         
