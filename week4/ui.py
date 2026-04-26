@@ -2,6 +2,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import random
+""" the code is ui"""
 
 from pso_logic import Particle, run_pso_step
 
