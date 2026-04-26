@@ -2,63 +2,46 @@
 import random
 import math
 
-""" ba kurty aua project bo aua bakar det chon bashtyrn charasar bdozyau ka peshtr nayznay
-nmuna waku bashtrkrndy reuray gayandn for example amazon"""
 class Particle:
-    """
-    au class mabsty tanokakana
-    """
+    """ har tanolkayak xaleky julaua lasar shahshaka"""
+  
 
     def __init__(self, x, y, color):
         """ auayn point x y color har yakayan ja goal yan har pointek auayh constuctior"""
        
         self.x = x                          # current x position
         self.y = y                          # current y position
-        self.vx = random.uniform(-2, 2) 
+        self.vx = random.uniform(-2, 2)
+        """ particle sarata randomly dagore""" 
             #auayn vilocity x akaya wata xery range -2 bo 2 agar negative bo posative
         self.vy = random.uniform(-2, 2)
             # auayan veilocity yakaya
         self.best_x = x                    
-        self.best_y = y                     
+        self.best_y = y     
+        """ au x y lagal dozynauay sheuana nueyaka nue dakreta"""                
         self.best_fitness = float('inf') 
-           # chand la amanj nzytka ta point bchuktr by bashtra infity
+
+           #  wata la zhmary gawara dast pe dakachand la amanj nzytka ta point bchuktr by bashtra infity
            #wata har maudayaky rastaqna bchuk be updated dakretuaa
         self.color = color      
                     
 
     def fitness(self, goal_x, goal_y):
         # auayan calucaltey fintess ba ecludance distance
-        """
-        Calculate fitness as Euclidean distance to goal.
-        
-        In PSO, we minimize fitness (lower is better).
-        Fitness = sqrt((x - goal_x)^2 + (y - goal_y)^2)
-        
-        Args:
-            goal_x, goal_y: Target coordinates in 2D space
-            
-        Returns:
-            Fitness value (distance to goal, lower is better)
-        """
+       
+        """ ba kurty fitness wata charasaraka chand bash"""
 
         return math.sqrt((self.x - goal_x) ** 2 + (self.y - goal_y) ** 2)
 
 
 
     def update_personal_best(self, goal_x, goal_y):
-        #aya pegay estam bashtera yan pesh
-        """
-        Check if current position is better than the particle's personal best.
-        If so, update the personal best position and fitness.
-        
-        Args:
-            goal_x, goal_y: Target coordinates
-            
-        Returns:
-            Current fitness value
-        """
+        #aya pegay estam bashtera yan pesh 
+         #wata check  daka  aya pegay estam basthra lauany peshu agar basthra bbest bka aua
+         # waku balnday bena pesh chaut
+       
         f = self.fitness(goal_x, goal_y)
-        """ au desginacy atu esta ley"""
+        """ au desginacy atu esta ley kamay bchuk tra au bashtar"""
         if f < self.best_fitness:
             """ wata au pointeky essta ley bashtr bu lauay peshutre"""
             self.best_fitness = f
@@ -66,28 +49,14 @@ class Particle:
             self.best_y = self.y
             """ save new best poistion best fitness function daka"""
         return f
+    
 
+# updated xeray la dahtu bo chue bjuleny ba xeray
     def update_velocity(self, global_best_x, global_best_y, w, c1, c2):
         """ bashtryn shuen lalayan hamu tanolkakanaua
         w zabr c1 factary ferbuny kasyu auay tr factary ferbuny komalayty
         bryary dada chon bjule"""
-        """
-        Update particle velocity using the PSO velocity formula:
         
-        v_new = w*v_old + c1*r1*(pBest - x) + c2*r2*(gBest - x)
-        
-        This formula balances three forces:
-        1. Inertia (w*v_old): Keep moving in the same direction
-        2. Cognitive (c1*r1*(pBest-x)): Pull toward personal best
-        3. Social (c2*r2*(gBest-x)): Pull toward global best
-        
-        Args:
-            global_best_x, global_best_y: Best position found by swarm
-            w: Inertia weight (0.0 - 1.0) — higher values = more momentum
-            c1: Cognitive coefficient (typically 1.5) — pull toward personal best
-            c2: Social coefficient (typically 1.5) — pull toward global best
-        """
-        # Random values for stochastic exploration
         r1 = random.random()
         r2 = random.random()
         """ au random number between zero and one"""
@@ -122,6 +91,7 @@ class Particle:
 
 
 def run_pso_step(particles, goal_x, goal_y, global_best, w, c1, c2):
+    #wata hamu functianak ka run dabe yak iteration
     """ contorly hamu iterationakan daka ka lanau programaka ru dadad """
   
     gbx, gby, gbf = global_best
@@ -142,8 +112,19 @@ def run_pso_step(particles, goal_x, goal_y, global_best, w, c1, c2):
     return (gbx, gby, gbf)
 
 
-""" simple difintion
-auaya ka projectaka sarata  randomly dajule
-dautar la pointkany traua fer dabe
-distance mabasty fitness
-personal best aya era bashtrn shuena agar haua print kay"""
+"""بیرۆکەیەکی سادە (زۆر گرنگە)
+
+تەنۆلکەیەک (باڵندە) لەسەر بنەمای ٣ شت دەجوڵێت: ١.
+
+🧭 جوڵەی ئێستای (زەبری)
+🧠 باشترین پێگەی خۆی (بیرەوەری)
+🌍 باشترین شوێن کە هەموو تەنۆلکەکان دەیدۆزنەوە"""
+
+
+
+
+
+
+
+
+
