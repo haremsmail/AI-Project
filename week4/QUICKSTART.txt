@@ -1,0 +1,105 @@
+📋 PSO VISUALIZATION — QUICK START GUIDE
+=========================================
+
+🚀 TO RUN THE PROJECT:
+
+  1. Navigate to week4 folder:
+     cd path/to/week4
+
+  2. Run the application:
+     python main.py
+
+  3. That's it! No pip install needed. ✓
+
+
+⚙️ SYSTEM REQUIREMENTS:
+
+  - Python 3.7 or higher
+  - Tkinter (built-in with Python)
+
+
+📖 BASIC USAGE:
+
+  1. Set PSO parameters on the right panel
+  2. Click ▶ Start
+  3. Watch particles converge to the goal
+  4. Use ⏸ Pause, 🔄 Reset, and speed slider to control
+  5. Click 📌 Show Selected on Canvas to replay iterations
+
+
+🎓 DEFAULT PSO PARAMETERS:
+
+  Number of Particles:  10
+  Goal Location:       (325, 325) — center of canvas
+  Inertia Weight (w):  0.7
+  Cognitive (c1):      1.5
+  Social (c2):         1.5
+  Max Iterations:      100
+
+
+📊 VISUALIZATION LEGEND:
+
+  🔴 Pink Star       = Goal/Target position
+  🟢 Green Crosshair = Best solution found
+  🌈 Colored Circles = Particles (each numbered)
+  → Arrows           = Particle velocity vectors
+  ✓✓✓ Faded Trails   = Recent movement history
+
+
+🧠 PSO ALGORITHM IN THE CODE:
+
+  pso_logic.py:
+    - Particle class: Represents one swarm member
+    - run_pso_step(): Core PSO iteration logic
+    
+  ui.py:
+    - PSOApp class: Main GUI application
+    - _animate(): Animation loop
+    - _draw(): Visualization
+
+
+📝 FOR MORE DETAILS:
+
+  See README.md for complete documentation
+  All functions have detailed docstrings
+
+
+💡 TIPS:
+
+  • High w (e.g., 0.9):  Faster exploration, slower convergence
+  • Low w (e.g., 0.3):   Faster convergence, less exploration
+  
+  • High c1, low c2:     Particles explore independently
+  • Low c1, high c2:     Particles follow the swarm
+  
+  • Slow speed slider:   Study particle behavior
+  
+  • Try 20 particles:    Watch swarm dynamics
+  • Try 1 particle:      See pure hill-climbing
+
+
+🐛 IF TKINTER NOT FOUND:
+
+  Ubuntu/Debian:  sudo apt-get install python3-tk
+  Fedora:         sudo dnf install python3-tkinter
+  macOS:          Included with python.org Python
+  Windows:        Already included by default
+
+
+🎓 EDUCATIONAL:
+
+  This project is perfect for:
+  - Learning PSO algorithms
+  - GUI development practice
+  - Understanding optimization
+  - University assignments
+
+
+✨ PROJECT VERSION: 2.0
+   Features: Velocity vectors, particle trails, replay history
+   Author: haremsmail (AI-Project Week 4)
+   License: MIT
+
+═══════════════════════════════════════════════════════════════════
+
+Enjoy the visualization! 🚀

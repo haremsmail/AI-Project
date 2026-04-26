@@ -1,0 +1,28 @@
+# PSO Visualization - Particle Swarm Optimization
+# No external libraries required - using only Python standard library
+# Python 3.7+
+
+# Tkinter is built-in with Python
+# No additional packages needed
+
+
+واتای پڕۆژەکە چییە
+
+بیرکردنەوە:
+
+زۆر خاڵی بچووک = تەنۆلکە
+یەک خاڵی ئامانج = ئامانج
+تەنۆلکەکان هەنگاو بە هەنگاو بەرەو باشترین شوێن دەڕۆن
+بەکارهێنەر دەتوانێت وەک ئەنیمەیشن سەیری جوڵەکە بکات
+
+ئەمەش پێی دەوترێت PSO Visualization.
+
+وەک باڵندەکان کە بەدوای خواردندا دەگەڕێن:
+هەر باڵندەیەک = تەنۆلکە
+
+ئەوان بە پشتبەستن بە:
+
+باشترین پێگەی خۆیان (Personal Best = pBest)
+باشترین شوێنی ڕەوە (Global Best = gBest)
+
+تا دەگەنە ئامانج

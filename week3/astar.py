@@ -86,11 +86,11 @@ class AStarFinder:
             path.append(current.name)
             current = current.parent
             """
-            G → C → B → S
+            G → C → B → S 
 
 
 
-  "G", "C", "B", "S"]
+ "G", "C", "B", "S"]
             """
         path.reverse()
         return path
