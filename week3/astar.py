@@ -2,7 +2,7 @@
 from heapq import heappush, heappop
 """ this heap used for priority queue in A* algorithm"""
 
-
+"""---"""
 class AStarFinder:
     """A* pathfinding algorithm"""
     
@@ -35,10 +35,10 @@ class AStarFinder:
         """ add start node to the priority queue with f cost and unique id"""
         while self.open_list:
             """ au loop step by step esh daka lo dozyanauy best path"""
-            _, _, current_node = heappop(self.open_list)
-            """ teakes best node push priority que  au du batala f ,id"""
+            _f_cost, _node_id, current_node = heappop(self.open_list)
+            """ takes best node push priority que  au du batala f ,id"""
             
-            """ agar alerady lanau priority queu habu skip bka"""
+            """ agar already lanau priority queue habu skip bka"""
             if current_node.name in self.closed_list:
             
                 continue
@@ -51,11 +51,10 @@ class AStarFinder:
                 """ rebuild path nmuna agar g,s,b, daygore s,b,g"""
                 """ agar current node goal bu buasta la serach krdn"""
                 self.total_cost = current_node.g
-                """ total cost g balue"""
                 return self.path, self.exploration_order, self.total_cost
             
             for neighbor in current_node.neighbors:
-                """ for current node check allnode connected"""
+                """ for current node check all node connected"""
                 if neighbor.name in self.closed_list:
                     """ agar jiranakay haman node ka chuy boy ignoty kba"""
                     continue
@@ -91,11 +90,11 @@ class AStarFinder:
             path.append(current.name)
             current = current.parent
             """
-            G → C → B → S
+            G → C → B → S 
 
 
 
-  "G", "C", "B", "S"]
+ "G", "C", "B", "S"]
             """
         path.reverse()
         return path

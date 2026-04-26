@@ -1,0 +1,42 @@
+==================================================
+VACUUM CLEANER SEARCH PROBLEM SOLUTION
+Algorithm: Depth First Search (DFS)
+Generated: 2026-04-05 22:31:37
+==================================================
+
+INITIAL BOARD:
+. . . . # .
+. . # . . .
+. . . # # .
+. # . . # .
+V . . . G .
+. . . . . #
+
+Board Size: 6 x 6
+Vacuum Position: (4, 0)
+Dirt Position: (4, 4)
+
+SOLUTION FOUND!
+--------------------------------------------------
+
+STEPS TO SOLUTION:
+1. Move UP from (4, 0) to (3, 0) (Cost: 2)
+2. Move UP from (3, 0) to (2, 0) (Cost: 2)
+3. Move UP from (2, 0) to (1, 0) (Cost: 2)
+4. Move UP from (1, 0) to (0, 0) (Cost: 2)
+5. Move RIGHT from (0, 0) to (0, 1) (Cost: 1)
+6. Move DOWN from (0, 1) to (1, 1) (Cost: 0)
+7. Move DOWN from (1, 1) to (2, 1) (Cost: 0)
+8. Move RIGHT from (2, 1) to (2, 2) (Cost: 1)
+9. Move DOWN from (2, 2) to (3, 2) (Cost: 0)
+10. Move DOWN from (3, 2) to (4, 2) (Cost: 0)
+11. Move DOWN from (4, 2) to (5, 2) (Cost: 0)
+12. Move RIGHT from (5, 2) to (5, 3) (Cost: 1)
+13. Move UP from (5, 3) to (4, 3) (Cost: 2)
+14. Move RIGHT from (4, 3) to (4, 4) (Cost: 1)
+
+--------------------------------------------------
+TOTAL COST: 14
+TOTAL MOVES: 14
+
+==================================================

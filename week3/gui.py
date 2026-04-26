@@ -404,6 +404,7 @@ f → total score
     def reset(self):
         """Reset"""
         self.graph.clear()
+        
         self.solution_path = self.explored_nodes = []
         self.positions.clear()
         self.start_node = self.goal_node = self.selected_node = None

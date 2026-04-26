@@ -67,6 +67,6 @@ class Graph:
         return sum(len(node.neighbors) for node in self.nodes.values())
     
     def clear(self):
-        """Clear graph"""
+        """Remove all nodes and edges from the graph"""
         self.nodes.clear()
 

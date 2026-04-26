@@ -11,14 +11,16 @@ class Node:
         self.x = x
         self.y = y
         self.neighbors = []
+        """ inf=infinity,, means no path found yet"""
         self.g = float('inf') 
-        """ real distance from start to currnet node"""
-        """ cost from start to t this node  deffualt inf"""
+        """ real distance from start to current node"""
+        """ cost from start to t this node  default inf"""
         self.h = 0
-        """ h distance to agel"""
+        """ estimated distance to goal"""
         self.f = float('inf')
-        
+        """ total score (g+h)"""
         self.parent = None
+        """ remembers which node led to this one, Used to track back the path"""
         
     def add_neighbor(self, neighbor_node):
         """Add edge to neighbor"""
@@ -48,12 +50,12 @@ class Node:
         self.h = 0
         self.f = float('inf')
         self.parent = None
-        """ used to reset all cost in a algoriht"""
+        """ used to reset all cost in a algorithm"""
     
     def __lt__(self, other):
         """Compare by f cost"""
         return self.f < other.f
-    """ smaller is better a valuey bchture bu """
+    """ smaller is better a value bchture bu """
     
     def __eq__(self, other):
         """Check if same node"""
