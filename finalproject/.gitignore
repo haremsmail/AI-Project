@@ -1,0 +1,51 @@
+# Data
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/README.md
+data/processed/*
+!data/processed/.gitkeep
+
+# Models
+models/*.keras
+models/*.joblib
+!models/.gitkeep
+
+# Results
+results/*.png
+results/*.csv
+!results/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+.jupyter/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dataset (too large for version control)
+mango_leaf_disease_dataset/

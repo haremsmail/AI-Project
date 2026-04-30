@@ -7,10 +7,10 @@ class Particle:
   
 
     def __init__(self, x, y, color):
-        """ auayn point x y color har yakayan ja goal yan har pointek auayh constuctior"""
+        
        
-        self.x = x                          # current x position
-        self.y = y                          # current y position
+        self.x = x                          
+        self.y = y                         
         self.vx = random.uniform(-2, 2)
         """ particle sarata randomly dagore""" 
             #auayn vilocity x akaya wata xery range -2 bo 2 agar negative bo posative
@@ -73,6 +73,7 @@ class Particle:
                    + c1 * r1 * (self.best_y - self.y)
                    + c2 * r2 * (global_best_y - self.y))
 
+
     def update_position(self):
         """ auany tanolkaka dabata julakaya nwe"""
         """
@@ -111,14 +112,6 @@ def run_pso_step(particles, goal_x, goal_y, global_best, w, c1, c2):
 
     return (gbx, gby, gbf)
 
-
-"""بیرۆکەیەکی سادە (زۆر گرنگە)
-
-تەنۆلکەیەک (باڵندە) لەسەر بنەمای ٣ شت دەجوڵێت: ١.
-
-🧭 جوڵەی ئێستای (زەبری)
-🧠 باشترین پێگەی خۆی (بیرەوەری)
-🌍 باشترین شوێن کە هەموو تەنۆلکەکان دەیدۆزنەوە"""
 
 
 

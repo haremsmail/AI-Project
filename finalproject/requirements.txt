@@ -1,0 +1,14 @@
+jupyter
+matplotlib
+numpy
+pandas
+pillow
+seaborn
+scikit-learn
+scikit-image
+opencv-python
+tensorflow>=2.15
+joblib
+tqdm
+kaggle
+ipykernel
