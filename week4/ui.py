@@ -2,6 +2,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import random
+""" the code is ui"""
 
 from pso_logic import Particle, run_pso_step
 
@@ -140,7 +141,7 @@ class PSOApp:
 
     def _draw(self, goal_x, goal_y):
         self.canvas.delete("all")
-        for i in range(0, 651, 50):
+        for i in range(0, 650, 50):
             self.canvas.create_line(i, 0, i, 620, fill="#313244", dash=(2, 4))
             self.canvas.create_line(0, i, 620, i, fill="#313244", dash=(2, 4))
         r = 12
