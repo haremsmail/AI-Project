@@ -26,7 +26,7 @@ from src.models import train_knn, train_gaussian_nb, train_svm_rbf, train_cnn, e
 
 
 # ============================================================================
-# COLORS FOR TERMINAL OUTPUT
+# COLORS FOR TERMINAL OUTPUT DESIGN
 # ============================================================================
 class Colors:
     HEADER = '\033[95m'
