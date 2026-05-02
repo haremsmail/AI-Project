@@ -4,24 +4,35 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Sequence
+"""  amazha danuse bo ko krdnauay dauakaryakan"""
 
+import matplotlib
+matplotlib.use('TkAgg')  # Use interactive backend so plots show on screen
 import matplotlib.pyplot as plt
+""" auayan bo drust krndy bar chartu auan  bakar de"""
 import numpy as np
 import pandas as pd
+""" this used to for table result"""
 import seaborn as sns
+""" auayan bo graficky juantr bakar de """
 from sklearn.metrics import confusion_matrix, roc_curve, auc
+""" higher roc better model """
 from sklearn.preprocessing import label_binarize
+""" convert class daka bo binary matrix"""
 
 from .config import RESULTS_DIR
 
 sns.set_theme(style="whitegrid", palette="deep")
+""" auayn wata graph white backraoundy habe """
 
-
+""" aua save graphaka daua helper functiel dadane bo graphaka"""
 def save_figure(path: str | Path) -> Path:
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(output_path, bbox_inches="tight", dpi=180)
     return output_path
+""" restulta  wardagre ba graph"""
+
 
 
 def plot_class_distribution(dataframe: pd.DataFrame, label_column: str = "label", title: str = "Class Distribution", output_path: str | Path | None = None):
@@ -35,6 +46,7 @@ def plot_class_distribution(dataframe: pd.DataFrame, label_column: str = "label"
     figure.tight_layout()
     if output_path:
         save_figure(output_path)
+    plt.show()  
     return figure
 
 
@@ -53,12 +65,13 @@ def plot_sample_images(samples: Sequence[tuple[np.ndarray, str]], title: str = "
     figure.tight_layout()
     if output_path:
         save_figure(output_path)
+    plt.show()  # Show plot on screen
     return figure
 
-
+""" bo pishan danay auay chand wena la har data setek da haya """
 def plot_confusion_matrix(y_true, y_pred, class_names: Sequence[str], title: str = "Confusion Matrix", output_path: str | Path | None = None):
     matrix = confusion_matrix(y_true, y_pred)
-    figure, axis = plt.subplots(figsize=(8, 6))
+    figure, axis = plt.subplots(figsize=(10, 8))
     sns.heatmap(matrix, annot=True, fmt="d", cmap="Blues", xticklabels=class_names, yticklabels=class_names, ax=axis)
     axis.set_xlabel("Predicted")
     axis.set_ylabel("Actual")
@@ -66,6 +79,7 @@ def plot_confusion_matrix(y_true, y_pred, class_names: Sequence[str], title: str
     figure.tight_layout()
     if output_path:
         save_figure(output_path)
+    plt.show()  # Show plot on screen
     return figure
 
 
@@ -75,11 +89,12 @@ def plot_metric_comparison(results: pd.DataFrame, output_path: str | Path | None
     figure, axis = plt.subplots(figsize=(12, 6))
     sns.barplot(data=melted, x="model", y="score", hue="metric", ax=axis)
     axis.set_ylim(0, 1)
-    axis.set_title("Model Comparison")
+    axis.set_title("Model Comparison - Accuracy, Precision, Recall, F1")
     axis.tick_params(axis="x", rotation=20)
     figure.tight_layout()
     if output_path:
         save_figure(output_path)
+    plt.show()  # Show plot on screen
     return figure
 
 
@@ -99,6 +114,7 @@ def plot_training_curves(history, output_path: str | Path | None = None):
     figure.tight_layout()
     if output_path:
         save_figure(output_path)
+    plt.show()  # Show plot on screen
     return figure
 
 
@@ -107,7 +123,7 @@ def plot_roc_curves(y_true, probabilities, class_names: Sequence[str], title: st
     if probabilities is None:
         return None
     y_true_binarized = label_binarize(y_true, classes=np.arange(class_count))
-    figure, axis = plt.subplots(figsize=(8, 6))
+    figure, axis = plt.subplots(figsize=(10, 8))
     for class_index, class_name in enumerate(class_names):
         if class_index >= probabilities.shape[1]:
             continue
@@ -122,4 +138,5 @@ def plot_roc_curves(y_true, probabilities, class_names: Sequence[str], title: st
     figure.tight_layout()
     if output_path:
         save_figure(output_path)
+    plt.show()  
     return figure

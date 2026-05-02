@@ -1,7 +1,6 @@
 """Model training and evaluation helpers."""
 
 from __future__ import annotations
-
 from dataclasses import dataclass
 """ data class result modealkany tedaya"""
 from typing import Any
@@ -26,12 +25,18 @@ from sklearn.preprocessing import label_binarize
 
 @dataclass
 class EvaluationResult:
+    """ bo halgrtny anjamy halsangand """
     model_name: str
     accuracy: float
     precision: float
+    """ wrdbyny modelaka nmuna 20 ruak naxoshy ahay au 16 garndauatau"""
     recall: float
+    """ wabirhenanan lanau hamu naxoshakan ruakan 
+    modleakan chandyan dozyaua"""
     f1: float
+    """ balancy newuan wrdbynuy wabir henanauay"""
     roc_auc: float | None = None
+    """ model chand bash polakan jiadakatau barztr bashtra"""
 
     def as_dict(self) -> dict[str, float | str | None]:
         return {
@@ -42,62 +47,131 @@ class EvaluationResult:
             "f1": self.f1,
             "roc_auc": self.roc_auc,
         }
-
-
+    """ data dagory bo table dict[strin float none data type]
+    return maby some thing like this
+    {
+ "model": "CNN",
+ "accuracy": 0.97,
+ "precision": 0.96,
+ "recall": 0.97,
+ "f1": 0.96,
+ "roc_auc": 0.99
+}"""
+ 
+"""drusktnry rahanany model knn bakar henany data rahenrau  bakar henanu taybatmandy lely galay bameu """
 def train_knn(x_train: np.ndarray, y_train: np.ndarray, n_neighbors: int = 7) -> KNeighborsClassifier:
+    """ xtrain input taybat mandy  rahenrau la x-train row image column dakre rgb auana bet
+    ytrain datay esh lasarkrau ja  healthy any one
+    au 7 nzyktryn 7 jiran hsab da"""
+    """ katek wenay nwe hat 7 nzytkryn wena lek dadataua"""
+    """ drause nyzkakan grngy zyatr wardagrn"""
     model = KNeighborsClassifier(n_neighbors=n_neighbors, weights="distance")
     model.fit(x_train, y_train)
+    """ nmunakan labir daka zyatr datay rahnerau haldagre"""
     return model
+    """ modely rahenrau dagarenetaua
+    nmuna agar 7 sample 6 helghty yakay naxosh aua helahy"""
+    """ esta model pridic lo bakar henana"""
+
 
 
 def train_gaussian_nb(x_train: np.ndarray, y_train: np.ndarray) -> GaussianNB:
+    """ xtrian taybatamany   gala ytrain nauy naxoshy rast"""
     model = GaussianNB()
+    """ ba bakar henany nmra pekhautau auana agar daka """
+    """sckitl learn modely amadakrau pe wysta modelakan la sfr drus bky
+    labiry auay xot birkayana au esha bkay modely hazr bakary de"""
     model.fit(x_train, y_train)
     return model
 
 
+""" zor jar anjameky bahez dadda lasar tabat mandya dastyakan"""
 def train_svm_rbf(x_train: np.ndarray, y_train: np.ndarray, c_value: float = 10.0) -> SVC:
+    """ x hamysha featuerakay y  rahenrauakay"""
+    """ floag 10 halajan control daka snury tund """
     model = SVC(kernel="rbf", C=c_value, probability=True, class_weight="balanced")
+    """ rega ba snury bryardna line kehsrau dada rega ba snury bryardnay  keshraua 
+    katak data kan saxu anay tr tekal bun rbf snur lanuanyan dakesh
+    balance drust bka laneaun wenay konu xxor """
     model.fit(x_train, y_train)
+    """babakar henany handcrafte """
     return model
 
 
+
+
+""" au functina bakar de bo taqy krndauy modely rahenrau
+duay train krnd modeklakan ta chand bashn bo data nabinrauakan
+input xtest y test output pridciotn yan probley if have"""
+""" this ffunciton evaluate which mode is best """
+
+
+
+""" au function evaluate modekala daka ka kamay basthr"""
 def evaluate_classifier(model: Any, x_test: np.ndarray, y_test: np.ndarray, class_count: int | None = None) -> tuple[EvaluationResult, np.ndarray, np.ndarray | None]:
     predictions = model.predict(x_test)
+    """ daua la model daka bo peshbnyn krny modely taqy rkd"""
     probabilities = None
     roc_auc = None
+    """ modelaka chand bash classkan jiadata"""
 
     if hasattr(model, "predict_proba"):
+        """ aya modelaaka arky agry haya yaxud na hamuayn hayan svm  agar chalak krabe"""
         probabilities = model.predict_proba(x_test)
+        """Get probabilities.
+
+Example:
+
+Healthy = 0.90
+Mildew = 0.05
+Anthracnose = 0.05"""
     elif hasattr(model, "decision_function"):
+        """ aya modleaka nmary bryar dany haya yaxud na"""
         decision_values = model.decision_function(x_test)
         if decision_values.ndim == 1:
+            """ anjamy brayary yak dimention daykaya du dimention"""
             probabilities = np.column_stack([1 - decision_values, decision_values])
         else:
             probabilities = decision_values
 
     average = "weighted"
+    """ auany numnay zyatrayn haya keshy restuly ba dast bena basha bo data na hausangakan"""
     result = EvaluationResult(
         model_name=model.__class__.__name__,
         accuracy=float(accuracy_score(y_test, predictions)),
         precision=float(precision_score(y_test, predictions, average=average, zero_division=0)),
         recall=float(recall_score(y_test, predictions, average=average, zero_division=0)),
+        
         f1=float(f1_score(y_test, predictions, average=average, zero_division=0)),
-    )
 
+    )
+    """ zero division wata dur bkaua la hala agar preidiont sfr habe"""
+
+
+    """ bashy modealkan lanau polakan jia dakatau"""
     if probabilities is not None and class_count is not None:
         try:
             classes = np.arange(class_count)
+            """ auayn bo drust krndy class numberka"""
             y_test_binarized = label_binarize(y_test, classes=classes)
+            """ au labelanay ka ahaya ayankata binery
+             nmuna lauany ruaky sax  001"""
             if probabilities.shape[1] == 1:
                 roc_auc = float(roc_auc_score(y_test_binarized, probabilities, multi_class="ovr"))
             else:
+                """ har classak barabr daka ba classakany tr"""
                 roc_auc = float(roc_auc_score(y_test_binarized, probabilities, multi_class="ovr", average="macro"))
+                """ averagey yaksan ba ham model bda ba gwerey codaka"""
         except Exception:
             roc_auc = None
+            """ mission probley wrong shap"""
 
     result.roc_auc = roc_auc
+    """ har modelk chan bash polakan jia dakata"""
     return result, predictions, probabilities
+
+
+
 
 
 def build_cnn_model(input_shape: tuple[int, int, int], class_count: int):
@@ -136,28 +210,22 @@ def build_cnn_model(input_shape: tuple[int, int, int], class_count: int):
     )
     return model
 
-
+""" auayan rastauy peshbyny poly naxoshy dakat"""
 def train_cnn(X_train: np.ndarray, y_train: np.ndarray, X_test: np.ndarray, y_test: np.ndarray, epochs: int = 10):
-    """Train CNN model"""
+    """Train CNN model on raw image arrays (shape: N, H, W, 3).
+    
+    X_train, X_test should be uint8 images of shape (N, 224, 224, 3).
+    Returns (model, history) tuple.
+    """
     import tensorflow as tf
     from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
     from tensorflow.keras.preprocessing.image import ImageDataGenerator
     from .config import IMAGE_SIZE, BATCH_SIZE
     
-    # Reshape data for CNN (add channel dimension)
-    X_train_expanded = np.expand_dims(X_train, -1)
-    if X_train_expanded.shape[1] != IMAGE_SIZE[0]:
-        # Resize if needed
-        from tensorflow.image import resize
-        X_train_expanded = resize(X_train_expanded, IMAGE_SIZE).numpy()
-    
-    X_test_expanded = np.expand_dims(X_test, -1)
-    if X_test_expanded.shape[1] != IMAGE_SIZE[0]:
-        X_test_expanded = resize(X_test_expanded, IMAGE_SIZE).numpy()
-    
-    # Build model
+    # Images should already be (N, H, W, 3) RGB uint8
+    # Build model with 3-channel input
     class_count = len(np.unique(y_train))
-    model = build_cnn_model(input_shape=(IMAGE_SIZE[0], IMAGE_SIZE[1], 1), class_count=class_count)
+    model = build_cnn_model(input_shape=(IMAGE_SIZE[0], IMAGE_SIZE[1], 3), class_count=class_count)
     
     # Data augmentation
     train_datagen = ImageDataGenerator(
@@ -168,20 +236,31 @@ def train_cnn(X_train: np.ndarray, y_train: np.ndarray, X_test: np.ndarray, y_te
         horizontal_flip=True,
         fill_mode='nearest'
     )
+    """✅ بۆچی زیادکردن گرنگە
+
+وێنەی یەک گەڵا دەتوانێت ببێتە چەندین وەشانی:
+
+سووڕاوە
+گۆڕدرا
+زووم کراوە
+وەرگەڕا
+
+سی ئێن ئێن بەهێز دەبێت"""
     
-    # Callbacks
+    #  contorly zyraky taybat lakaty rahenan da
     callbacks = [
         EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True),
         ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=3, min_lr=1e-7)
     ]
     
-    # Train
-    model.fit(
-        train_datagen.flow(X_train_expanded, y_train, batch_size=BATCH_SIZE),
-        validation_data=(X_test_expanded, y_test),
+    # Train - images are scaled by Rescaling layer inside the model
+    history = model.fit(
+        train_datagen.flow(X_train, y_train, batch_size=BATCH_SIZE),
+        validation_data=(X_test / 255.0, y_test),
         epochs=epochs,
         callbacks=callbacks,
-        verbose=0
+        verbose=1
     )
+    """ go back best model weight"""
     
-    return model
+    return model, history
