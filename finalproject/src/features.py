@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 """Feature extraction for handcrafted and deep image descriptors."""
 """ taybat wmandy wena lagalay bame bar daka """
-from __future__ import annotations
+
 """ featuer bashtr bang dakat bo codakan amadakrnd amazha krndy jory paktr la codaka"""
 
 from dataclasses import dataclass
