@@ -3,13 +3,24 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+""" data class result modealkany tedaya"""
 from typing import Any
+""" bo typakan lanau modlakan bakar de"""
 
 import numpy as np
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
+""" bo peuanay har yakanay manay chya wrdbynay accuracy har yakayn
+katek modeelaka peuanay naxoshy daa chand jar rast
+seyakm  chand naxoshy rastyqna dozraua
+
+recal score chand halaty naxohsy reastaqyna dozrayaua
+last one quality rezbandyakan dapeua barztr bahsta"""
 from sklearn.naive_bayes import GaussianNB
+""" au modelakany problity bakar dene fast balam simple"""
 from sklearn.neighbors import KNeighborsClassifier
+""" peshbyny daka ba psht bastn ba  nzyktryn wenay hausheua"""
 from sklearn.svm import SVC
+""" ba psht bastn bau vectoranay ba amer peuana krayan"""
 from sklearn.preprocessing import label_binarize
 
 
