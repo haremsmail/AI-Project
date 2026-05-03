@@ -1,4 +1,4 @@
-"""Plotting helpers for the project report and notebook."""
+2"""Plotting helpers for the project report and notebook."""
 
 from __future__ import annotations
 
